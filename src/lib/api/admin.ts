@@ -235,15 +235,18 @@ export async function getAdminInstructors(
 }
 
 export async function getAdminInstructor(code: string, accessToken: string): Promise<{ data: TeacherContent }> {
-  return apiGet<{ data: TeacherContent }>(`/teachers/${code}`, accessToken);
+  const teacher = await apiGet<TeacherContent>(`/teachers/${code}`, accessToken);
+  return { data: teacher };
 }
 
 export async function createAdminInstructor(data: any, accessToken: string): Promise<{ data: TeacherContent }> {
-  return apiPost<{ data: TeacherContent }>("/teachers", data, accessToken);
+  const teacher = await apiPost<TeacherContent>("/teachers", data, accessToken);
+  return { data: teacher };
 }
 
 export async function updateAdminInstructor(code: string, data: any, accessToken: string): Promise<{ data: TeacherContent }> {
-  return apiPatch<{ data: TeacherContent }>(`/teachers/${code}`, data, accessToken);
+  const teacher = await apiPatch<TeacherContent>(`/teachers/${code}`, data, accessToken);
+  return { data: teacher };
 }
 
 export async function deleteAdminInstructor(code: string, accessToken: string): Promise<DeleteResponse> {
@@ -308,15 +311,18 @@ export async function getAdminWorkshops(
 }
 
 export async function getAdminWorkshop(id: string, accessToken: string): Promise<{ data: WorkshopContent }> {
-  return apiGet<{ data: WorkshopContent }>(`/workshops/${id}`, accessToken);
+  const workshop = await apiGet<WorkshopContent>(`/workshops/${id}`, accessToken);
+  return { data: workshop };
 }
 
 export async function createAdminWorkshop(data: any, accessToken: string): Promise<{ data: WorkshopContent }> {
-  return apiPost<{ data: WorkshopContent }>("/workshops", data, accessToken);
+  const workshop = await apiPost<WorkshopContent>("/workshops", data, accessToken);
+  return { data: workshop };
 }
 
 export async function updateAdminWorkshop(id: string, data: any, accessToken: string): Promise<{ data: WorkshopContent }> {
-  return apiPatch<{ data: WorkshopContent }>(`/workshops/${id}`, data, accessToken);
+  const workshop = await apiPatch<WorkshopContent>(`/workshops/${id}`, data, accessToken);
+  return { data: workshop };
 }
 
 export async function deleteAdminWorkshop(id: string, accessToken: string): Promise<DeleteResponse> {
