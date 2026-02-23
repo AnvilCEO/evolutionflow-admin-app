@@ -11,6 +11,7 @@ interface AdminSidebarProps {
 const menuItems = [
   { label: "대시보드", href: "/admin", icon: "📊" },
   { label: "회원관리", href: "/admin/members", icon: "👥" },
+  { label: "신청관리", href: "/admin/requests", icon: "✅" },
   { label: "강사관리", href: "/admin/instructors", icon: "🎓" },
   { label: "워크샵", href: "/admin/workshops", icon: "📚" },
   { label: "스케줄", href: "/admin/schedules", icon: "📅" },
