@@ -1,4 +1,5 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
+const BACKEND_API_ORIGIN = process.env.BACKEND_API_ORIGIN ?? "https://evolutionflow-dev-api.vercel.app/api";
 
 export class ApiError extends Error {
   constructor(
@@ -13,7 +14,13 @@ async function request<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
+  // For server-side rendering, use direct backend URL
+  // For client-side, use direct API URL
+  const url = typeof window === "undefined"
+    ? `${BACKEND_API_ORIGIN}${path}`
+    : `${API_BASE}${path}`;
+
+  const res = await fetch(url, {
     ...options,
     headers: {
       "Content-Type": "application/json",
