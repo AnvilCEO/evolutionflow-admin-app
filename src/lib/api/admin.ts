@@ -234,20 +234,20 @@ export async function getAdminInstructors(
   return apiGet(path, accessToken);
 }
 
-export async function getAdminInstructor(code: string, accessToken: string) {
-  return apiGet(`/teachers/${code}`, accessToken);
+export async function getAdminInstructor(code: string, accessToken: string): Promise<{ data: TeacherContent }> {
+  return apiGet<{ data: TeacherContent }>(`/teachers/${code}`, accessToken);
 }
 
-export async function createAdminInstructor(data: any, accessToken: string) {
-  return apiPost("/teachers", data, accessToken);
+export async function createAdminInstructor(data: any, accessToken: string): Promise<{ data: TeacherContent }> {
+  return apiPost<{ data: TeacherContent }>("/teachers", data, accessToken);
 }
 
-export async function updateAdminInstructor(code: string, data: any, accessToken: string) {
-  return apiPatch(`/teachers/${code}`, data, accessToken);
+export async function updateAdminInstructor(code: string, data: any, accessToken: string): Promise<{ data: TeacherContent }> {
+  return apiPatch<{ data: TeacherContent }>(`/teachers/${code}`, data, accessToken);
 }
 
-export async function deleteAdminInstructor(code: string, accessToken: string) {
-  return apiDelete(`/teachers/${code}`, accessToken);
+export async function deleteAdminInstructor(code: string, accessToken: string): Promise<DeleteResponse> {
+  return apiDelete<DeleteResponse>(`/teachers/${code}`, accessToken);
 }
 
 /**
@@ -307,20 +307,20 @@ export async function getAdminWorkshops(
   };
 }
 
-export async function getAdminWorkshop(id: string, accessToken: string) {
-  return apiGet(`/workshops/${id}`, accessToken);
+export async function getAdminWorkshop(id: string, accessToken: string): Promise<{ data: WorkshopContent }> {
+  return apiGet<{ data: WorkshopContent }>(`/workshops/${id}`, accessToken);
 }
 
-export async function createAdminWorkshop(data: any, accessToken: string) {
-  return apiPost("/workshops", data, accessToken);
+export async function createAdminWorkshop(data: any, accessToken: string): Promise<{ data: WorkshopContent }> {
+  return apiPost<{ data: WorkshopContent }>("/workshops", data, accessToken);
 }
 
-export async function updateAdminWorkshop(id: string, data: any, accessToken: string) {
-  return apiPatch(`/workshops/${id}`, data, accessToken);
+export async function updateAdminWorkshop(id: string, data: any, accessToken: string): Promise<{ data: WorkshopContent }> {
+  return apiPatch<{ data: WorkshopContent }>(`/workshops/${id}`, data, accessToken);
 }
 
-export async function deleteAdminWorkshop(id: string, accessToken: string) {
-  return apiDelete(`/workshops/${id}`, accessToken);
+export async function deleteAdminWorkshop(id: string, accessToken: string): Promise<DeleteResponse> {
+  return apiDelete<DeleteResponse>(`/workshops/${id}`, accessToken);
 }
 
 /**
@@ -386,20 +386,20 @@ export async function getAdminSchedules(
   };
 }
 
-export async function getAdminSchedule(id: string, accessToken: string) {
-  return apiGet(`/schedules/${id}`, accessToken);
+export async function getAdminSchedule(id: string, accessToken: string): Promise<{ data: ScheduleContent }> {
+  return apiGet<{ data: ScheduleContent }>(`/schedules/${id}`, accessToken);
 }
 
-export async function createAdminSchedule(data: any, accessToken: string) {
-  return apiPost("/schedules", data, accessToken);
+export async function createAdminSchedule(data: any, accessToken: string): Promise<{ data: ScheduleContent }> {
+  return apiPost<{ data: ScheduleContent }>("/schedules", data, accessToken);
 }
 
-export async function updateAdminSchedule(id: string, data: any, accessToken: string) {
-  return apiPatch(`/schedules/${id}`, data, accessToken);
+export async function updateAdminSchedule(id: string, data: any, accessToken: string): Promise<{ data: ScheduleContent }> {
+  return apiPatch<{ data: ScheduleContent }>(`/schedules/${id}`, data, accessToken);
 }
 
-export async function deleteAdminSchedule(id: string, accessToken: string) {
-  return apiDelete(`/schedules/${id}`, accessToken);
+export async function deleteAdminSchedule(id: string, accessToken: string): Promise<DeleteResponse> {
+  return apiDelete<DeleteResponse>(`/schedules/${id}`, accessToken);
 }
 
 /**
