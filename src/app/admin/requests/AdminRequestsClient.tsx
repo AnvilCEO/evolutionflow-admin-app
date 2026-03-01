@@ -34,6 +34,7 @@ export default function AdminRequestsClient() {
 
   const [activeTab, setActiveTab] = useState<Tab>("teacher");
   const [statusFilter, setStatusFilter] = useState<Status>("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [teacherRequests, setTeacherRequests] = useState<RequestItem[]>([]);
   const [workshopRequests, setWorkshopRequests] = useState<RequestItem[]>([]);
   const [tripEventRequests, setTripEventRequests] = useState<RequestItem[]>([]);
@@ -148,8 +149,34 @@ export default function AdminRequestsClient() {
   };
 
   const getFilteredRequests = (requests: RequestItem[]) => {
-    if (statusFilter === "all") return requests;
-    return requests.filter((req) => req.status === statusFilter);
+    let filtered = requests;
+
+    // 상태 필터링
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((req) => req.status === statusFilter);
+    }
+
+    // 검색어 필터링
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((req) => {
+        const name = (req.name || "").toLowerCase();
+        const email = (req.user?.email || "").toLowerCase();
+        const title = (req.title || "").toLowerCase();
+        const className = (req.className || "").toLowerCase();
+        const instructorName = (req.instructorName || "").toLowerCase();
+
+        return (
+          name.includes(query) ||
+          email.includes(query) ||
+          title.includes(query) ||
+          className.includes(query) ||
+          instructorName.includes(query)
+        );
+      });
+    }
+
+    return filtered;
   };
 
   const getStatusBadge = (status: string) => {
@@ -230,25 +257,54 @@ export default function AdminRequestsClient() {
             ))}
           </div>
 
-          {/* 필터 */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            {(["all", "pending", "approved", "rejected"] as const).map((status) => (
-              <button
-                key={status}
-                onClick={() => setStatusFilter(status)}
-                className={`font-pretendard px-4 py-2 text-[13px] font-bold rounded transition-colors ${
-                  statusFilter === status
-                    ? "bg-black text-white"
-                    : "bg-[#f5f5f5] text-black hover:bg-[#e5e5e5]"
-                }`}
-              >
-                {status === "all" && "전체"}
-                {status === "pending" && "심사중"}
-                {status === "approved" && "승인"}
-                {status === "rejected" && "거절"}
-              </button>
-            ))}
+          {/* 검색 및 필터 */}
+          <div className="mb-6">
+            {/* 검색 입력 */}
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="이름, 이메일, 제목 등으로 검색..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2 border border-[#e5e5e5] rounded font-pretendard text-[14px] focus:outline-none focus:border-black"
+              />
+            </div>
+
+            {/* 상태 필터 */}
+            <div className="flex flex-wrap gap-2">
+              {(["all", "pending", "approved", "rejected"] as const).map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setStatusFilter(status)}
+                  className={`font-pretendard px-4 py-2 text-[13px] font-bold rounded transition-colors ${
+                    statusFilter === status
+                      ? "bg-black text-white"
+                      : "bg-[#f5f5f5] text-black hover:bg-[#e5e5e5]"
+                  }`}
+                >
+                  {status === "all" && "전체"}
+                  {status === "pending" && "심사중"}
+                  {status === "approved" && "승인"}
+                  {status === "rejected" && "거절"}
+                </button>
+              ))}
+            </div>
           </div>
+
+          {/* 검색 결과 요약 */}
+          {searchQuery && (
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded">
+              <p className="font-pretendard text-[14px] text-blue-600">
+                검색 결과: <span className="font-bold">{
+                  activeTab === "teacher"
+                    ? getFilteredRequests(teacherRequests).length
+                    : activeTab === "workshop"
+                    ? getFilteredRequests(workshopRequests).length
+                    : getFilteredRequests(tripEventRequests).length
+                }</span>건
+              </p>
+            </div>
+          )}
 
           {actionError && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded">
