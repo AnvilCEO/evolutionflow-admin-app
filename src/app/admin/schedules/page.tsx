@@ -90,7 +90,7 @@ export default function SchedulesPage() {
     }, 500);
 
     return () => clearTimeout(debounceTimer);
-  }, [page, pageSize, searchQuery, statusFilter, typeFilter, sortKey, sortDirection, accessToken]);
+  }, [page, pageSize, searchQuery, statusFilter, typeFilter, sortKey, sortDirection, authLoading, accessToken]);
 
   const handleSort = (key: string, direction: "asc" | "desc") => {
     setSortKey(key);

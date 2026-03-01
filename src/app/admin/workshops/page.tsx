@@ -88,7 +88,7 @@ export default function WorkshopsPage() {
     }, 500);
 
     return () => clearTimeout(debounceTimer);
-  }, [page, pageSize, searchQuery, statusFilter, levelFilter, sortKey, sortDirection, accessToken]);
+  }, [page, pageSize, searchQuery, statusFilter, levelFilter, sortKey, sortDirection, authLoading, accessToken]);
 
   const handleSort = (key: string, direction: "asc" | "desc") => {
     setSortKey(key);
