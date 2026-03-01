@@ -38,16 +38,53 @@ export default function InstructorsPage() {
         setIsLoading(true);
         setError(null);
 
+        // Fetch a wider range and apply deterministic client-side filtering/sorting/pagination.
         const response = await getAdminInstructors(accessToken, {
-          page,
-          limit: pageSize,
-          search: searchQuery || undefined,
-          grade: gradeFilter || undefined,
-          country: countryFilter || undefined,
+          page: 1,
+          limit: 500,
         });
 
-        setInstructors(response.data);
-        setTotal(response.total);
+        const normalizedQuery = searchQuery.trim().toLowerCase();
+
+        let filtered = response.data.filter((item) => {
+          const matchesSearch = !normalizedQuery
+            || item.name.toLowerCase().includes(normalizedQuery)
+            || String(item.tagline ?? "").toLowerCase().includes(normalizedQuery)
+            || item.code.toLowerCase().includes(normalizedQuery);
+
+          const matchesGrade = !gradeFilter || item.grade === gradeFilter;
+          const matchesCountry = !countryFilter || item.country === countryFilter;
+
+          return matchesSearch && matchesGrade && matchesCountry;
+        });
+
+        filtered.sort((a, b) => {
+          const aValue = (a as unknown as Record<string, unknown>)[sortKey];
+          const bValue = (b as unknown as Record<string, unknown>)[sortKey];
+
+          if (aValue == null && bValue == null) return 0;
+          if (aValue == null) return sortDirection === "asc" ? -1 : 1;
+          if (bValue == null) return sortDirection === "asc" ? 1 : -1;
+
+          if (typeof aValue === "number" && typeof bValue === "number") {
+            return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+          }
+
+          const left = String(aValue).toLowerCase();
+          const right = String(bValue).toLowerCase();
+          if (left === right) return 0;
+
+          if (sortDirection === "asc") {
+            return left > right ? 1 : -1;
+          }
+          return left < right ? 1 : -1;
+        });
+
+        const startIndex = (page - 1) * pageSize;
+        const paged = filtered.slice(startIndex, startIndex + pageSize);
+
+        setInstructors(paged);
+        setTotal(filtered.length);
       } catch (err: unknown) {
         const error = err instanceof Error ? err : new Error(String(err));
         setError(error.message || "강사 목록을 불러올 수 없습니다.");
@@ -62,7 +99,7 @@ export default function InstructorsPage() {
     }, 500);
 
     return () => clearTimeout(debounceTimer);
-  }, [page, pageSize, searchQuery, gradeFilter, countryFilter, sortKey, sortDirection, accessToken]);
+  }, [page, pageSize, searchQuery, gradeFilter, countryFilter, sortKey, sortDirection, authLoading, accessToken]);
 
   const handleSort = (key: string, direction: "asc" | "desc") => {
     setSortKey(key);

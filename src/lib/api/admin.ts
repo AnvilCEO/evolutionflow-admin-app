@@ -335,7 +335,7 @@ export async function deleteAdminWorkshop(id: string, accessToken: string): Prom
 
 export interface ScheduleContent {
   id: string;
-  classType: "REGULAR" | "TTC" | "SPECIAL";
+  classType: "REGULAR" | "TTC" | "SPECIAL" | "WORKSHOP";
   className: string;
   instructorName: string;
   startDate: string;
@@ -350,6 +350,31 @@ export interface ScheduleContent {
   imageUrl?: string;
   status: "OPEN" | "FULL" | "WAITLIST" | "CANCELLED";
   isActive: boolean;
+}
+
+function mapScheduleToContent(s: any): ScheduleContent {
+  const normalizedType = String(s.type || s.classType || "REGULAR").toUpperCase();
+  const normalizedStatus = String(s.status || "OPEN").toUpperCase();
+
+  return {
+    ...s,
+    id: s.id,
+    className: s.title || s.className || "",
+    classType: normalizedType,
+    instructorName: s.instructor?.name || s.instructorName || "N/A",
+    currentApplicants: s.enrolled ?? s.currentApplicants ?? 0,
+    startDate: s.date ? String(s.date).split("T")[0] : s.startDate,
+    endDate: s.endDate ? String(s.endDate).split("T")[0] : (s.date ? String(s.date).split("T")[0] : s.startDate),
+    days: s.days || [],
+    timeInfo: s.timeInfo || `${s.startTime || ""} - ${s.endTime || ""}`.trim(),
+    locationInfo: s.locationInfo || s.location || "-",
+    classDesc: s.classDesc || s.note || "",
+    status: normalizedStatus,
+    price: s.price ?? 0,
+    capacity: s.capacity ?? 0,
+    isActive: s.isActive ?? true,
+    imageUrl: s.imageUrl,
+  } as ScheduleContent;
 }
 
 export async function getAdminSchedules(
@@ -375,33 +400,25 @@ export async function getAdminSchedules(
   const path = `/schedules${queryString ? `?${queryString}` : ""}`;
   const response = await apiGet<any>(path, accessToken);
 
-  // Map backend response to ScheduleContent interface
   return {
     ...response,
-    data: response.data.map((s: any) => ({
-      ...s,
-      className: s.title,
-      classType: (s.type || "REGULAR").toUpperCase(),
-      instructorName: s.instructor?.name || "N/A",
-      currentApplicants: s.enrolled || 0,
-      startDate: s.date ? s.date.split('T')[0] : s.startDate,
-      endDate: s.endDate || s.date?.split('T')[0],
-      days: s.days || [],
-      timeInfo: s.timeInfo || `${s.startTime || ""} - ${s.endTime || ""}`,
-    })),
+    data: response.data.map((s: any) => mapScheduleToContent(s)),
   };
 }
 
 export async function getAdminSchedule(id: string, accessToken: string): Promise<{ data: ScheduleContent }> {
-  return apiGet<{ data: ScheduleContent }>(`/schedules/${id}`, accessToken);
+  const schedule = await apiGet<any>(`/schedules/${id}`, accessToken);
+  return { data: mapScheduleToContent(schedule) };
 }
 
 export async function createAdminSchedule(data: any, accessToken: string): Promise<{ data: ScheduleContent }> {
-  return apiPost<{ data: ScheduleContent }>("/schedules", data, accessToken);
+  const schedule = await apiPost<any>("/schedules", data, accessToken);
+  return { data: mapScheduleToContent(schedule) };
 }
 
 export async function updateAdminSchedule(id: string, data: any, accessToken: string): Promise<{ data: ScheduleContent }> {
-  return apiPatch<{ data: ScheduleContent }>(`/schedules/${id}`, data, accessToken);
+  const schedule = await apiPatch<any>(`/schedules/${id}`, data, accessToken);
+  return { data: mapScheduleToContent(schedule) };
 }
 
 export async function deleteAdminSchedule(id: string, accessToken: string): Promise<DeleteResponse> {

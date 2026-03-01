@@ -1,26 +1,33 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useState } from "react";
+
 import AdminTable from "../components/AdminTable";
-import StatusBadge from "../components/StatusBadge";
 import ActionMenu from "../components/ActionMenu";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { useAuth } from "@/contexts/AuthContext";
+import { getAdminSchedules, ScheduleContent } from "@/lib/api/admin";
+import { formatDate } from "@/lib/utils/format";
 
-// Define a placeholder type until the actual API is implemented
-interface EventItem {
+interface TripEventItem {
   id: string;
   title: string;
-  type: "banner" | "popup" | "promotion";
+  classType: "SPECIAL" | "TTC" | "WORKSHOP";
+  instructorName: string;
   startDate: string;
   endDate: string;
-  status: "active" | "scheduled" | "ended" | "draft";
-  clickCount: number;
+  timeInfo: string;
+  locationInfo: string;
+  currentApplicants: number;
+  capacity: number;
+  status: "OPEN" | "FULL" | "WAITLIST" | "CANCELLED";
+  isActive: boolean;
 }
 
 export default function EventsPage() {
-  const { accessToken } = useAuth();
-  const [events, setEvents] = useState<EventItem[]>([]);
+  const { accessToken, isLoading: authLoading } = useAuth();
+
+  const [events, setEvents] = useState<TripEventItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,48 +42,70 @@ export default function EventsPage() {
   const [sortKey, setSortKey] = useState("startDate");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
-  // Mock Fetch events data
   useEffect(() => {
     async function fetchEvents() {
-      if (!accessToken) return;
+      if (authLoading) return;
+      if (!accessToken) {
+        setIsLoading(false);
+        setError("로그인이 필요합니다.");
+        return;
+      }
 
       try {
         setIsLoading(true);
         setError(null);
 
-        // API call would go here
+        const response = await getAdminSchedules(accessToken, {
+          page: 1,
+          limit: 500,
+        });
 
-        // Mock data
-        await new Promise(resolve => setTimeout(resolve, 800));
-        const now = new Date();
-        const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-        const lastMonth = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        const source = response.data.filter(
+          (item) => item.classType !== "REGULAR",
+        );
 
-        const mockData: EventItem[] = [
-          { id: "e1", title: "신규 강사 모집 배너", type: "banner", startDate: now.toISOString(), endDate: nextWeek.toISOString(), status: "active", clickCount: 1240 },
-          { id: "e2", title: "봄맞이 수강 할인 이벤트", type: "promotion", startDate: now.toISOString(), endDate: nextWeek.toISOString(), status: "active", clickCount: 532 },
-          { id: "e3", title: "앱 업데이트 공지 팝업", type: "popup", startDate: nextWeek.toISOString(), endDate: new Date(nextWeek.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString(), status: "scheduled", clickCount: 0 },
-          { id: "e4", title: "2025년 연말 결산 리포트", type: "banner", startDate: lastMonth.toISOString(), endDate: now.toISOString(), status: "ended", clickCount: 8900 },
-          { id: "e5", title: "추석 연휴 휴무 안내", type: "popup", startDate: nextWeek.toISOString(), endDate: nextWeek.toISOString(), status: "draft", clickCount: 0 },
-        ];
+        const normalizedQuery = searchQuery.trim().toLowerCase();
+        let filtered = source.filter((item) => {
+          const matchesSearch = !normalizedQuery
+            || item.className.toLowerCase().includes(normalizedQuery)
+            || item.instructorName.toLowerCase().includes(normalizedQuery)
+            || item.locationInfo.toLowerCase().includes(normalizedQuery);
+          const matchesStatus = !statusFilter || item.status === statusFilter;
+          const matchesType = !typeFilter || item.classType === typeFilter;
+          return matchesSearch && matchesStatus && matchesType;
+        });
 
-        let filtered = mockData;
-        if (searchQuery) {
-          filtered = filtered.filter(e => e.title.includes(searchQuery));
-        }
-        if (statusFilter) {
-          filtered = filtered.filter(e => e.status === statusFilter);
-        }
-        if (typeFilter) {
-          filtered = filtered.filter(e => e.type === typeFilter);
-        }
+        filtered.sort((a, b) => {
+          const aValue = (a as unknown as Record<string, unknown>)[sortKey] ?? "";
+          const bValue = (b as unknown as Record<string, unknown>)[sortKey] ?? "";
+          if (sortDirection === "asc") return aValue > bValue ? 1 : -1;
+          return aValue < bValue ? 1 : -1;
+        });
 
-        setEvents(filtered);
-        setTotal(filtered.length);
+        const mapped: TripEventItem[] = filtered.map((item: ScheduleContent) => ({
+          id: item.id,
+          title: item.className,
+          classType: item.classType as "SPECIAL" | "TTC" | "WORKSHOP",
+          instructorName: item.instructorName,
+          startDate: item.startDate,
+          endDate: item.endDate,
+          timeInfo: item.timeInfo,
+          locationInfo: item.locationInfo,
+          currentApplicants: item.currentApplicants,
+          capacity: item.capacity,
+          status: item.status,
+          isActive: item.isActive,
+        }));
+
+        const startIndex = (page - 1) * pageSize;
+        const paged = mapped.slice(startIndex, startIndex + pageSize);
+
+        setEvents(paged);
+        setTotal(mapped.length);
       } catch (err: unknown) {
-        const error = err instanceof Error ? err : new Error(String(err));
-        setError(error.message || "Trip&Event 목록을 불러올 수 없습니다.");
-        console.error("Failed to fetch events:", err);
+        const parsedError = err instanceof Error ? err : new Error(String(err));
+        setError(parsedError.message || "Trip&Event 목록을 불러올 수 없습니다.");
+        console.error("Failed to fetch trip-events:", err);
       } finally {
         setIsLoading(false);
       }
@@ -84,10 +113,10 @@ export default function EventsPage() {
 
     const debounceTimer = setTimeout(() => {
       fetchEvents();
-    }, 500);
+    }, 400);
 
     return () => clearTimeout(debounceTimer);
-  }, [page, pageSize, searchQuery, statusFilter, typeFilter, sortKey, sortDirection, accessToken]);
+  }, [page, pageSize, searchQuery, statusFilter, typeFilter, sortKey, sortDirection, authLoading, accessToken]);
 
   const handleSort = (key: string, direction: "asc" | "desc") => {
     setSortKey(key);
@@ -95,117 +124,94 @@ export default function EventsPage() {
     setPage(1);
   };
 
-  const handleStatusChange = async (eventId: string, newStatus: "active" | "scheduled" | "ended" | "draft") => {
-    if (!accessToken) return;
-
-    try {
-      // API call would go here
-      // For now, update UI optimistically
-      setEvents(events.map(e =>
-        e.id === eventId ? { ...e, status: newStatus } : e
-      ));
-    } catch (err: unknown) {
-      console.error("Failed to update event status:", err);
-      setError("Trip&Event 상태를 업데이트할 수 없습니다.");
+  const statusBadge = (status: TripEventItem["status"]) => {
+    if (status === "OPEN") {
+      return <span className="inline-flex rounded px-2 py-1 text-xs font-medium bg-green-50 text-green-700">예약 오픈</span>;
     }
+    if (status === "WAITLIST") {
+      return <span className="inline-flex rounded px-2 py-1 text-xs font-medium bg-purple-50 text-purple-700">대기 접수</span>;
+    }
+    if (status === "FULL") {
+      return <span className="inline-flex rounded px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700">마감</span>;
+    }
+    return <span className="inline-flex rounded px-2 py-1 text-xs font-medium bg-red-50 text-red-700">취소됨</span>;
+  };
+
+  const typeBadge = (type: TripEventItem["classType"]) => {
+    if (type === "SPECIAL") {
+      return <span className="inline-flex rounded px-2 py-1 text-xs font-medium bg-blue-50 text-blue-700">Trip & Event</span>;
+    }
+    if (type === "WORKSHOP") {
+      return <span className="inline-flex rounded px-2 py-1 text-xs font-medium bg-emerald-50 text-emerald-700">워크샵형 이벤트</span>;
+    }
+    return <span className="inline-flex rounded px-2 py-1 text-xs font-medium bg-orange-50 text-orange-700">TTC</span>;
   };
 
   const columns: Array<{
-    key: keyof EventItem;
+    key: keyof TripEventItem;
     label: string;
     sortable?: boolean;
     width?: string;
-    render?: (value: unknown, item: EventItem) => React.ReactNode;
+    render?: (value: unknown, item: TripEventItem) => React.ReactNode;
   }> = [
     {
       key: "title",
-      label: "캠페인/이벤트명",
+      label: "제목",
       sortable: true,
-      render: (value: unknown) => <span className="font-bold">{value as string}</span>
+      render: (value: unknown, item: TripEventItem) => (
+        <div>
+          <div className="font-semibold text-gray-900">{value as string}</div>
+          <div className="mt-1 text-xs text-gray-500">{item.locationInfo}</div>
+        </div>
+      ),
     },
     {
-      key: "type",
+      key: "classType",
       label: "유형",
-      render: (value: unknown) => {
-        const typeMap: Record<string, string> = {
-            banner: "메인 배너",
-            popup: "팝업 공지",
-            promotion: "기획전/프로모션",
-        };
-        const colors: Record<string, string> = {
-            banner: "bg-blue-100 text-blue-800",
-            popup: "bg-purple-100 text-purple-800",
-            promotion: "bg-orange-100 text-orange-800",
-        };
-        const type = value as string;
-        return <span className={`px-2 py-1 rounded text-xs font-medium ${colors[type]}`}>{typeMap[type]}</span>;
-      }
+      sortable: true,
+      render: (value: unknown) => typeBadge(value as TripEventItem["classType"]),
     },
     {
       key: "startDate",
-      label: "노출 기간",
+      label: "일정",
       sortable: true,
-      render: (value: unknown, item: EventItem) => {
-        const start = new Date(value as string).toLocaleDateString("ko-KR");
-        const end = new Date(item.endDate).toLocaleDateString("ko-KR");
-        return <span className="text-sm">{start} ~ {end}</span>;
-      },
+      render: (value: unknown, item: TripEventItem) => (
+        <div>
+          <div className="text-sm">{formatDate(value as string)} ~ {formatDate(item.endDate)}</div>
+          <div className="mt-1 text-xs text-gray-500">{item.timeInfo}</div>
+        </div>
+      ),
     },
     {
-      key: "clickCount",
-      label: "조회/클릭수",
+      key: "currentApplicants",
+      label: "예약 현황",
       sortable: true,
-      render: (value: unknown) => <span className="font-medium text-gray-700">{Number(value).toLocaleString()}</span>
+      render: (value: unknown, item: TripEventItem) => {
+        const current = Number(value);
+        return <span className="font-medium">{current} / {item.capacity}명</span>;
+      },
     },
     {
       key: "status",
       label: "상태",
-      render: (value: unknown) => {
-        const status = value as "active" | "scheduled" | "ended" | "draft";
-        const map: Record<string, "active" | "inactive" | "suspended"> = {
-          active: "active",
-          scheduled: "inactive",
-          ended: "inactive",
-          draft: "suspended",
-        };
-        const labels: Record<string, string> = {
-            active: "진행 중",
-            scheduled: "진행 예정",
-            ended: "종료됨",
-            draft: "작성 중",
-        };
-        return (
-            <div className="flex items-center gap-2">
-                <StatusBadge status={map[status]} />
-                <span className="text-xs text-gray-500 hidden md:inline">{labels[status]}</span>
-            </div>
-        );
-      },
+      sortable: true,
+      render: (value: unknown) => statusBadge(value as TripEventItem["status"]),
     },
     {
       key: "id",
       label: "작업",
       width: "w-24",
-      render: (value: unknown, item: EventItem) => (
+      render: (value: unknown, item: TripEventItem) => (
         <ActionMenu
           items={[
             {
-              label: "수정하기",
-              action: () => alert("Trip&Event 수정 페이지로 이동합니다. (구현 예정)"),
+              label: "내용 조회",
+              action: () => { window.location.href = `/admin/events/${item.id}`; },
             },
-            ...(item.status === "draft" ? [
-              {
-                label: "게시하기",
-                action: () => handleStatusChange(item.id, "active"),
-              },
-            ] : []),
-            ...(item.status === "active" || item.status === "scheduled" ? [
-              {
-                label: "강제 종료",
-                action: () => handleStatusChange(item.id, "ended"),
-                variant: "danger" as const,
-              },
-            ] : []),
+            {
+              label: "스케줄 상세 편집",
+              action: () => { window.location.href = `/admin/schedules/${item.id}`; },
+            },
           ]}
         />
       ),
@@ -214,29 +220,27 @@ export default function EventsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="font-pretendard text-3xl font-bold text-black">Trip&Event 관리</h1>
           <p className="font-pretendard mt-2 text-gray-600">
-            앱 및 웹사이트에 노출되는 트립, 배너, 팝업, 프로모션 이벤트를 관리합니다.
+            Trip&Event(SPECIAL) 및 TTC 항목을 조회하고 상세 내용을 확인합니다.
           </p>
         </div>
         <button
-          onClick={() => alert("신규 Trip&Event 등록 페이지로 이동합니다. (구현 예정)")}
-          className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition-colors flex items-center gap-2"
+          onClick={() => { window.location.href = "/admin/schedules/new"; }}
+          className="rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 transition-colors"
         >
-          <span>+</span> Trip&Event 등록
+          + Trip&Event 등록
         </button>
       </div>
 
-      {/* Filters */}
       <div className="grid gap-4 md:grid-cols-4">
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-700">검색</label>
           <input
             type="text"
-            placeholder="캠페인 명으로 검색..."
+            placeholder="제목, 강사, 장소 검색..."
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -247,7 +251,7 @@ export default function EventsPage() {
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700">노출 위치 (유형)</label>
+          <label className="mb-2 block text-sm font-medium text-gray-700">유형</label>
           <select
             value={typeFilter}
             onChange={(e) => {
@@ -257,14 +261,14 @@ export default function EventsPage() {
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
           >
             <option value="">전체 유형</option>
-            <option value="banner">메인 배너</option>
-            <option value="popup">팝업 공지</option>
-            <option value="promotion">기획전/프로모션</option>
+            <option value="SPECIAL">Trip&Event (SPECIAL)</option>
+            <option value="WORKSHOP">워크샵형 이벤트 (WORKSHOP)</option>
+            <option value="TTC">TTC</option>
           </select>
         </div>
 
         <div>
-           <label className="mb-2 block text-sm font-medium text-gray-700">진행 상태</label>
+          <label className="mb-2 block text-sm font-medium text-gray-700">상태</label>
           <select
             value={statusFilter}
             onChange={(e) => {
@@ -274,10 +278,10 @@ export default function EventsPage() {
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
           >
             <option value="">전체 상태</option>
-            <option value="active">진행 중 (노출 중)</option>
-            <option value="scheduled">진행 예정</option>
-            <option value="ended">종료됨</option>
-            <option value="draft">작성 중 (미노출)</option>
+            <option value="OPEN">예약 오픈</option>
+            <option value="WAITLIST">대기 접수</option>
+            <option value="FULL">마감</option>
+            <option value="CANCELLED">취소됨</option>
           </select>
         </div>
 
@@ -286,8 +290,8 @@ export default function EventsPage() {
           <button
             onClick={() => {
               setSearchQuery("");
-              setStatusFilter("");
               setTypeFilter("");
+              setStatusFilter("");
               setPage(1);
             }}
             className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -297,14 +301,12 @@ export default function EventsPage() {
         </div>
       </div>
 
-      {/* Error Alert */}
       {error && (
         <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">
           {error}
         </div>
       )}
 
-      {/* Table */}
       {isLoading ? (
         <LoadingSpinner message="Trip&Event 목록을 불러오는 중..." />
       ) : (
@@ -318,7 +320,6 @@ export default function EventsPage() {
             sortDirection={sortDirection}
           />
 
-          {/* Pagination */}
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-600">
               총 {total}건 중 {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, total)}건 표시
