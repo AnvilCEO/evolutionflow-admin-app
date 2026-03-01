@@ -17,7 +17,7 @@ import {
   rejectScheduleRequest,
 } from "@/lib/api/requests";
 
-type Tab = "teacher" | "workshop" | "schedule";
+type Tab = "teacher" | "workshop" | "tripevent";
 type Status = "all" | "pending" | "approved" | "rejected";
 
 interface RequestItem {
@@ -36,7 +36,7 @@ export default function AdminRequestsClient() {
   const [statusFilter, setStatusFilter] = useState<Status>("all");
   const [teacherRequests, setTeacherRequests] = useState<RequestItem[]>([]);
   const [workshopRequests, setWorkshopRequests] = useState<RequestItem[]>([]);
-  const [scheduleRequests, setScheduleRequests] = useState<RequestItem[]>([]);
+  const [tripEventRequests, setTripEventRequests] = useState<RequestItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -63,9 +63,9 @@ export default function AdminRequestsClient() {
         } else if (activeTab === "workshop") {
           const res = await getAllWorkshopRequests(accessToken);
           setWorkshopRequests(res.data);
-        } else if (activeTab === "schedule") {
+        } else if (activeTab === "tripevent") {
           const res = await getAllScheduleRequests(accessToken);
-          setScheduleRequests(res.data);
+          setTripEventRequests(res.data);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "데이터를 불러올 수 없습니다.");
@@ -95,9 +95,9 @@ export default function AdminRequestsClient() {
             req.id === id ? { ...req, status: "approved" } : req
           )
         );
-      } else if (activeTab === "schedule") {
+      } else if (activeTab === "tripevent") {
         await approveScheduleRequest(id, accessToken!);
-        setScheduleRequests((prev) =>
+        setTripEventRequests((prev) =>
           prev.map((req) =>
             req.id === id ? { ...req, status: "approved" } : req
           )
@@ -130,9 +130,9 @@ export default function AdminRequestsClient() {
             req.id === id ? { ...req, status: "rejected" } : req
           )
         );
-      } else if (activeTab === "schedule") {
+      } else if (activeTab === "tripevent") {
         await rejectScheduleRequest(id, accessToken!);
-        setScheduleRequests((prev) =>
+        setTripEventRequests((prev) =>
           prev.map((req) =>
             req.id === id ? { ...req, status: "rejected" } : req
           )
@@ -191,7 +191,7 @@ export default function AdminRequestsClient() {
 
   const filteredTeacherRequests = getFilteredRequests(teacherRequests);
   const filteredWorkshopRequests = getFilteredRequests(workshopRequests);
-  const filteredScheduleRequests = getFilteredRequests(scheduleRequests);
+  const filteredTripEventRequests = getFilteredRequests(tripEventRequests);
 
   return (
     <main className="flex min-h-screen flex-col bg-white">
@@ -210,7 +210,7 @@ export default function AdminRequestsClient() {
         <div className="mx-auto w-full max-w-[1400px] px-4 md:px-8">
           {/* 탭 */}
           <div className="flex flex-wrap gap-2 mb-6 border-b border-[#e5e5e5] pb-4">
-            {(["teacher", "workshop", "schedule"] as const).map((tab) => (
+            {(["teacher", "workshop", "tripevent"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => {
@@ -225,7 +225,7 @@ export default function AdminRequestsClient() {
               >
                 {tab === "teacher" && "강사 신청"}
                 {tab === "workshop" && "워크샵 신청"}
-                {tab === "schedule" && "스케줄 신청"}
+                {tab === "tripevent" && "트립&이벤트 신청"}
               </button>
             ))}
           </div>
@@ -280,7 +280,7 @@ export default function AdminRequestsClient() {
                 </p>
               )}
 
-              {activeTab === "schedule" && filteredScheduleRequests.length === 0 && (
+              {activeTab === "tripevent" && filteredTripEventRequests.length === 0 && (
                 <p className="font-pretendard text-[15px] text-[#7a7a7a] py-8 text-center">
                   신청이 없습니다.
                 </p>
@@ -381,9 +381,9 @@ export default function AdminRequestsClient() {
                   </div>
                 ))}
 
-              {/* 스케줄 신청 목록 */}
-              {activeTab === "schedule" &&
-                filteredScheduleRequests.map((req) => (
+              {/* 트립&이벤트 신청 목록 */}
+              {activeTab === "tripevent" &&
+                filteredTripEventRequests.map((req) => (
                   <div
                     key={req.id}
                     className="mb-4 p-6 border border-[#e5e5e5] rounded-lg"
