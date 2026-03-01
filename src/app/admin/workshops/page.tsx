@@ -7,6 +7,7 @@ import StatusBadge from "../components/StatusBadge";
 import ActionMenu from "../components/ActionMenu";
 import LoadingSpinner from "@/app/admin/components/LoadingSpinner";
 import { getAdminWorkshops, WorkshopContent } from "@/lib/api/admin";
+import { formatDate } from "@/lib/utils/format";
 
 export default function WorkshopsPage() {
   const { accessToken, isLoading: authLoading } = useAuth();
@@ -138,7 +139,7 @@ export default function WorkshopsPage() {
       sortable: true,
       render: (value: unknown, item: WorkshopContent) => (
         <span className="text-sm">
-          {item.startDate} ~ {item.endDate}
+          {formatDate(item.startDate)} ~ {formatDate(item.endDate)}
         </span>
       ),
     },

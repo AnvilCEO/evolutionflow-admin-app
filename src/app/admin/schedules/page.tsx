@@ -7,6 +7,7 @@ import StatusBadge from "../components/StatusBadge";
 import ActionMenu from "../components/ActionMenu";
 import LoadingSpinner from "@/app/admin/components/LoadingSpinner";
 import { getAdminSchedules, ScheduleContent } from "@/lib/api/admin";
+import { formatDate } from "@/lib/utils/format";
 
 export default function SchedulesPage() {
   const { accessToken, isLoading: authLoading } = useAuth();
@@ -147,7 +148,7 @@ export default function SchedulesPage() {
       sortable: true,
       render: (value: unknown, item: ScheduleContent) => (
         <div>
-          <div className="text-sm">{item.startDate} ~ {item.endDate}</div>
+          <div className="text-sm">{formatDate(item.startDate)} ~ {formatDate(item.endDate)}</div>
           <div className="text-xs text-gray-500 mt-1">{item.days.join(", ")} {item.timeInfo}</div>
         </div>
       ),

@@ -5,6 +5,7 @@ import Link from "next/link";
 export default function AdminDashboard() {
   const stats = [
     {
+      id: "daily-visitors",
       title: "일간 방문자수",
       value: "8,924",
       change: "+15% from yesterday",
@@ -12,6 +13,7 @@ export default function AdminDashboard() {
       href: "/admin",
     },
     {
+      id: "total-members",
       title: "총 회원수",
       value: "1,234",
       change: "+12% from last month",
@@ -19,6 +21,7 @@ export default function AdminDashboard() {
       href: "/admin/members",
     },
     {
+      id: "active-instructors",
       title: "활성 강사",
       value: "45",
       change: "+3 new this week",
@@ -26,6 +29,7 @@ export default function AdminDashboard() {
       href: "/admin/instructors",
     },
     {
+      id: "partnership-inquiries",
       title: "제휴문의",
       value: "5",
       change: "2 unread",
@@ -33,20 +37,23 @@ export default function AdminDashboard() {
       href: "/admin/partnerships",
     },
     {
+      id: "open-workshops",
       title: "오픈된 워크샵",
       value: "89",
       change: "+5 from last week",
       icon: "📚",
-      href: "/admin/classes",
+      href: "/admin/workshops",
     },
     {
+      id: "workshop-applicants",
       title: "워크샵 신청자수",
       value: "342",
       change: "+28 this week",
       icon: "🧘",
-      href: "/admin/classes",
+      href: "/admin/requests",
     },
     {
+      id: "trip-event-applicants",
       title: "Trip&Event 신청자 수",
       value: "1,050",
       change: "+120 this month",
@@ -54,6 +61,7 @@ export default function AdminDashboard() {
       href: "/admin/events",
     },
     {
+      id: "studios",
       title: "스튜디오",
       value: "12",
       change: "All operational",
@@ -106,7 +114,7 @@ export default function AdminDashboard() {
       {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <Link key={stat.href} href={stat.href}>
+          <Link key={stat.id} href={stat.href}>
             <div className="rounded-lg border border-gray-200 bg-white p-6 transition-all hover:shadow-lg hover:border-gray-300 cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
@@ -172,7 +180,7 @@ export default function AdminDashboard() {
                 강사 승인
               </button>
             </Link>
-            <Link href="/admin/classes">
+            <Link href="/admin/workshops">
               <button className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                 워크샵
               </button>
