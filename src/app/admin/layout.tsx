@@ -15,25 +15,15 @@ export default function AdminLayout({
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  /*
   useEffect(() => {
-    if (!isLoading && (!user || user.role !== 'ADMIN')) {
-      router.replace('/login');
+    if (!isLoading && (!user || user.role !== "ADMIN")) {
+      router.replace("/login");
     }
   }, [isLoading, user, router]);
 
-  if (isLoading || !user || user.role !== 'ADMIN') {
+  if (isLoading || !user || user.role !== "ADMIN") {
     return null;
   }
-  */
-
-  // Mock user for UI preview
-  const mockUser = user || {
-    id: 'mock-admin',
-    email: 'admin@evolutionflowglobal.com',
-    name: '관리자(PREVIEW)',
-    role: 'ADMIN'
-  };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -47,9 +37,9 @@ export default function AdminLayout({
       <div className="flex-1 flex flex-col">
         {/* Header */}
         <AdminHeader
-          user={mockUser as any}
+          user={user}
           onLogout={() => {
-            signOut();
+            void signOut();
             router.replace("/login");
           }}
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}

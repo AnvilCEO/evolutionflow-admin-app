@@ -1,5 +1,22 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 const BACKEND_API_ORIGIN = process.env.BACKEND_API_ORIGIN ?? "https://evolutionflow-dev-api.vercel.app/api";
+const API_PROXY_BASE = "/api/proxy";
+
+function getBrowserApiBase(): string {
+  if (typeof window === "undefined") return API_BASE;
+
+  const host = window.location.hostname.toLowerCase();
+  const isLocalhost =
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "::1" ||
+    host.endsWith(".local");
+
+  // Local development should use same-origin proxy to avoid backend CORS restrictions.
+  if (isLocalhost) return API_PROXY_BASE;
+
+  return API_BASE;
+}
 
 export class ApiError extends Error {
   constructor(
@@ -15,10 +32,10 @@ async function request<T>(
   options: RequestInit = {},
 ): Promise<T> {
   // For server-side rendering, use direct backend URL
-  // For client-side, use direct API URL
+  // For client-side localhost dev, use Next.js proxy to avoid CORS.
   const url = typeof window === "undefined"
     ? `${BACKEND_API_ORIGIN}${path}`
-    : `${API_BASE}${path}`;
+    : `${getBrowserApiBase()}${path}`;
 
   const res = await fetch(url, {
     ...options,

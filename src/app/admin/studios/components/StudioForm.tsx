@@ -1,0 +1,543 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { getCities, getRegions, extractLocationFromAddress } from "@/lib/api/admin/masters";
+import { COUNTRIES } from "@/lib/data/masterData";
+import type { AdminStudioItem, StudioFormData, StudioTab } from "@/types/studio";
+import type { CityMaster, RegionMaster } from "@/types/master";
+
+interface StudioFormProps {
+  studio?: AdminStudioItem;
+  isLoading?: boolean;
+  onSubmit: (data: StudioFormData) => Promise<void>;
+  onCancel: () => void;
+}
+
+export default function StudioForm({
+  studio,
+  isLoading = false,
+  onSubmit,
+  onCancel,
+}: StudioFormProps) {
+  const isEditMode = !!studio;
+
+  // Form State
+  const [formData, setFormData] = useState<StudioFormData>({
+    name: studio?.name || "",
+    tab: studio?.tab || "official",
+    country: studio?.country || "KR",
+    city: studio?.city || "",
+    region: studio?.region || "",
+    address: studio?.address || "",
+    phone: studio?.phone || "",
+    social: studio?.social || "",
+    lat: studio?.lat || 0,
+    lng: studio?.lng || 0,
+    managerName: studio?.managerName || "",
+    managerPhone: studio?.managerPhone || "",
+    managerEmail: studio?.managerEmail || "",
+    capacity: studio?.capacity || 0,
+    status: studio?.status || "active",
+    description: studio?.description || "",
+    operatingHours: studio?.operatingHours || "",
+    amenities: studio?.amenities || [],
+  });
+
+  // Master Data State
+  const [cities, setCities] = useState<CityMaster[]>([]);
+  const [regions, setRegions] = useState<RegionMaster[]>([]);
+  const [extracting, setExtracting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Load cities when country changes
+  useEffect(() => {
+    const loadCities = async () => {
+      try {
+        const citiesList = await getCities(formData.country as "KR" | "CN");
+        setCities(citiesList);
+        setFormData((prev) => ({ ...prev, city: "", region: "" }));
+        setRegions([]);
+      } catch (err) {
+        console.error("Failed to load cities:", err);
+      }
+    };
+    loadCities();
+  }, [formData.country]);
+
+  // Load regions when city changes
+  useEffect(() => {
+    const loadRegions = async () => {
+      if (formData.city) {
+        try {
+          const regionsList = await getRegions(formData.city);
+          setRegions(regionsList);
+          setFormData((prev) => ({ ...prev, region: "" }));
+        } catch (err) {
+          console.error("Failed to load regions:", err);
+        }
+      } else {
+        setRegions([]);
+      }
+    };
+    loadRegions();
+  }, [formData.city]);
+
+  // Handle address auto-extraction
+  const handleExtractLocation = async () => {
+    if (!formData.address.trim()) {
+      setError("주소를 입력해주세요.");
+      return;
+    }
+
+    try {
+      setExtracting(true);
+      setError(null);
+
+      const result = await extractLocationFromAddress(
+        formData.country as "KR" | "CN",
+        formData.address
+      );
+
+      if (result.confidence === "low") {
+        setError("주소에서 도시/지역을 추출할 수 없습니다. 수동으로 선택해주세요.");
+        return;
+      }
+
+      // Update form with extracted data
+      if (result.cityId) {
+        setFormData((prev) => ({
+          ...prev,
+          city: result.cityId!,
+        }));
+      }
+
+      if (result.confidence === "high" && result.regionId) {
+        // Wait for regions to load, then set region
+        setTimeout(() => {
+          setFormData((prev) => ({
+            ...prev,
+            region: result.regionId!,
+          }));
+        }, 100);
+      }
+    } catch (err) {
+      setError("주소 추출에 실패했습니다.");
+      console.error("Failed to extract location:", err);
+    } finally {
+      setExtracting(false);
+    }
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validation
+    if (!formData.name.trim()) {
+      setError("스튜디오명을 입력해주세요.");
+      return;
+    }
+
+    if (!formData.phone.trim()) {
+      setError("연락처를 입력해주세요.");
+      return;
+    }
+
+    if (!formData.address.trim()) {
+      setError("주소를 입력해주세요.");
+      return;
+    }
+
+    if (formData.lat === 0 || formData.lng === 0) {
+      setError("위도/경도를 입력해주세요.");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      setError(null);
+      await onSubmit(formData);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "저장에 실패했습니다.";
+      setError(errorMsg);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Error Alert */}
+      {error && (
+        <div className="rounded-md bg-red-50 p-4 text-sm text-red-800 border border-red-200">
+          {error}
+        </div>
+      )}
+
+      {/* 기본 정보 */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 className="text-lg font-bold mb-4 pb-2 border-b">기본 정보</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* 스튜디오명 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              스튜디오명 <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="예: 강남 A스튜디오"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+            />
+          </div>
+
+          {/* 스튜디오 유형 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              스튜디오 유형 <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={formData.tab}
+              onChange={(e) => setFormData({ ...formData, tab: e.target.value as StudioTab })}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+            >
+              <option value="official">공인 스튜디오</option>
+              <option value="partner">파트너 스튜디오</option>
+              <option value="associated">협력 스튜디오</option>
+            </select>
+          </div>
+
+          {/* 국가 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              국가 <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={formData.country}
+              onChange={(e) => setFormData({ ...formData, country: e.target.value as "KR" | "CN" })}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+            >
+              {COUNTRIES.map((country) => (
+                <option key={country.code} value={country.code}>
+                  {country.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* 도시 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              도시 <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={formData.city}
+              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+            >
+              <option value="">선택하세요</option>
+              {cities.map((city) => (
+                <option key={city.id} value={city.id}>
+                  {city.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* 지역 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              지역 <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={formData.region}
+              onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+              disabled={!formData.city}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none disabled:bg-gray-50 disabled:text-gray-500"
+            >
+              <option value="">선택하세요</option>
+              {regions.map((region) => (
+                <option key={region.id} value={region.name}>
+                  {region.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* 주소 */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              주소 <span className="text-red-500">*</span>
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                placeholder="예: 서울시 강남구 테헤란로 123"
+                className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={handleExtractLocation}
+                disabled={extracting || !formData.address.trim()}
+                className="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {extracting ? "추출 중..." : "자동추출"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 연락처 정보 */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 className="text-lg font-bold mb-4 pb-2 border-b">연락처 정보</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* 대표번호 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              대표번호 <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              placeholder="예: 02-1234-5678"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+            />
+          </div>
+
+          {/* SNS */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">SNS</label>
+            <input
+              type="text"
+              value={formData.social}
+              onChange={(e) => setFormData({ ...formData, social: e.target.value })}
+              placeholder="예: Instagram/username"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+            />
+          </div>
+
+          {/* 담당자명 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">담당자명</label>
+            <input
+              type="text"
+              value={formData.managerName}
+              onChange={(e) => setFormData({ ...formData, managerName: e.target.value })}
+              placeholder="예: 최관리"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+            />
+          </div>
+
+          {/* 담당자 전화 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">담당자 전화</label>
+            <input
+              type="tel"
+              value={formData.managerPhone}
+              onChange={(e) => setFormData({ ...formData, managerPhone: e.target.value })}
+              placeholder="예: 010-1234-5678"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+            />
+          </div>
+
+          {/* 담당자 이메일 */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">담당자 이메일</label>
+            <input
+              type="email"
+              value={formData.managerEmail}
+              onChange={(e) => setFormData({ ...formData, managerEmail: e.target.value })}
+              placeholder="예: manager@studio.com"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 시설 정보 */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 className="text-lg font-bold mb-4 pb-2 border-b">시설 정보</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* 수용 인원 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">수용 인원</label>
+            <input
+              type="number"
+              value={formData.capacity}
+              onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) || 0 })}
+              placeholder="예: 30"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+            />
+          </div>
+
+          {/* 운영 시간 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">운영 시간</label>
+            <input
+              type="text"
+              value={formData.operatingHours}
+              onChange={(e) => setFormData({ ...formData, operatingHours: e.target.value })}
+              placeholder="예: 09:00 - 22:00"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+            />
+          </div>
+
+          {/* 시설 설명 */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">시설 설명</label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="시설에 대한 설명을 입력하세요"
+              rows={3}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+            />
+          </div>
+
+          {/* 편의시설 */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-3">편의시설</label>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {["주차", "WiFi", "라커", "카페", "샤워실", "에어컨", "난방", "엘리베이터"].map((amenity) => (
+                <label key={amenity} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={(formData.amenities || []).includes(amenity)}
+                    onChange={(e) => {
+                      const currentAmenities = formData.amenities || [];
+                      if (e.target.checked) {
+                        setFormData({
+                          ...formData,
+                          amenities: [...currentAmenities, amenity],
+                        });
+                      } else {
+                        setFormData({
+                          ...formData,
+                          amenities: currentAmenities.filter((a) => a !== amenity),
+                        });
+                      }
+                    }}
+                    className="w-4 h-4 rounded border-gray-300 cursor-pointer"
+                  />
+                  <span className="text-sm text-gray-700">{amenity}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 위치 정보 */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 className="text-lg font-bold mb-4 pb-2 border-b">위치 정보</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* 위도 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              위도 <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              step="0.0001"
+              value={formData.lat}
+              onChange={(e) => setFormData({ ...formData, lat: parseFloat(e.target.value) || 0 })}
+              placeholder="예: 37.4979"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+            />
+          </div>
+
+          {/* 경도 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              경도 <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              step="0.0001"
+              value={formData.lng}
+              onChange={(e) => setFormData({ ...formData, lng: parseFloat(e.target.value) || 0 })}
+              placeholder="예: 127.0276"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 추가 정보 */}
+      {isEditMode && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-bold mb-4 pb-2 border-b">추가 정보</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* 상태 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">상태</label>
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as "active" | "inactive" | "maintenance" })}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
+              >
+                <option value="active">활성</option>
+                <option value="inactive">비활성</option>
+                <option value="maintenance">점검중</option>
+              </select>
+            </div>
+
+            {/* 등록일 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">등록일</label>
+              <div className="px-3 py-2 bg-gray-50 rounded-md border border-gray-300 text-sm text-gray-600">
+                {studio?.createdAt}
+              </div>
+            </div>
+
+            {/* 등록자 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">등록자</label>
+              <div className="px-3 py-2 bg-gray-50 rounded-md border border-gray-300 text-sm text-gray-600">
+                {studio?.createdBy}
+              </div>
+            </div>
+
+            {/* 수정일 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">수정일</label>
+              <div className="px-3 py-2 bg-gray-50 rounded-md border border-gray-300 text-sm text-gray-600">
+                {studio?.updatedAt}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Buttons */}
+      <div className="flex gap-2 justify-between pt-6 border-t">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+        >
+          취소
+        </button>
+
+        <button
+          type="submit"
+          disabled={submitting || isLoading}
+          className="px-6 py-2 bg-black text-white text-sm font-medium rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          {submitting || isLoading ? "저장 중..." : "저장"}
+        </button>
+      </div>
+    </form>
+  );
+}
