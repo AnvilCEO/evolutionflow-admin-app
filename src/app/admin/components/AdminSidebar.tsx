@@ -2,26 +2,69 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import {
+  ADMIN_MENU_DEFAULT_ITEMS,
+  ADMIN_MENU_STORAGE_KEY,
+  ADMIN_MENU_UPDATED_EVENT,
+  AdminMenuItem,
+  cloneAdminMenuItems,
+  normalizeAdminMenuItems,
+} from "@/constants/adminMenu";
 
 interface AdminSidebarProps {
   isOpen: boolean;
   onToggle: () => void;
 }
 
-const menuItems = [
-  { label: "대시보드", href: "/admin", icon: "📊" },
-  { label: "회원관리", href: "/admin/members", icon: "👥" },
-  { label: "신청관리", href: "/admin/requests", icon: "✅" },
-  { label: "강사관리", href: "/admin/instructors", icon: "🎓" },
-  { label: "워크샵", href: "/admin/workshops", icon: "📚" },
-  { label: "스케줄", href: "/admin/schedules", icon: "📅" },
-  { label: "스튜디오", href: "/admin/studios", icon: "🏢" },
-  { label: "Trip&Event", href: "/admin/events", icon: "🎉" },
-  { label: "제휴문의", href: "/admin/inquiries", icon: "🤝" },
-];
+function loadMenuItems(): AdminMenuItem[] {
+  if (typeof window === "undefined") {
+    return cloneAdminMenuItems(ADMIN_MENU_DEFAULT_ITEMS);
+  }
+
+  const rawValue = window.localStorage.getItem(ADMIN_MENU_STORAGE_KEY);
+  if (!rawValue) {
+    return cloneAdminMenuItems(ADMIN_MENU_DEFAULT_ITEMS);
+  }
+
+  try {
+    return normalizeAdminMenuItems(JSON.parse(rawValue));
+  } catch {
+    return cloneAdminMenuItems(ADMIN_MENU_DEFAULT_ITEMS);
+  }
+}
 
 export default function AdminSidebar({ isOpen, onToggle }: AdminSidebarProps) {
   const pathname = usePathname();
+  const [menuItems, setMenuItems] = useState<AdminMenuItem[]>(
+    cloneAdminMenuItems(ADMIN_MENU_DEFAULT_ITEMS),
+  );
+
+  useEffect(() => {
+    const syncMenuItems = () => setMenuItems(loadMenuItems());
+
+    syncMenuItems();
+
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== ADMIN_MENU_STORAGE_KEY) return;
+      syncMenuItems();
+    };
+
+    const onMenuUpdated = () => syncMenuItems();
+
+    window.addEventListener("storage", onStorage);
+    window.addEventListener(ADMIN_MENU_UPDATED_EVENT, onMenuUpdated);
+
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener(ADMIN_MENU_UPDATED_EVENT, onMenuUpdated);
+    };
+  }, []);
+
+  const visibleMenuItems = useMemo(
+    () => menuItems.filter((item) => item.visible),
+    [menuItems],
+  );
 
   return (
     <>
@@ -38,7 +81,7 @@ export default function AdminSidebar({ isOpen, onToggle }: AdminSidebarProps) {
 
         {/* Menu */}
         <nav className="flex-1 py-6">
-          {menuItems.map((item) => {
+          {visibleMenuItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link

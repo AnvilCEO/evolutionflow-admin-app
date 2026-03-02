@@ -32,6 +32,25 @@ function buildForwardHeaders(request: NextRequest): Headers {
   return headers;
 }
 
+function buildResponseHeaders(source: Headers): Headers {
+  const headers = new Headers();
+
+  source.forEach((value, key) => {
+    const lowerKey = key.toLowerCase();
+    if (
+      lowerKey === "content-encoding" ||
+      lowerKey === "content-length" ||
+      lowerKey === "transfer-encoding" ||
+      lowerKey === "connection"
+    ) {
+      return;
+    }
+    headers.set(key, value);
+  });
+
+  return headers;
+}
+
 async function proxy(request: NextRequest, context: RouteContext) {
   const { path } = await context.params;
   const targetUrl = buildTargetUrl(path, request.nextUrl.search);
@@ -50,7 +69,7 @@ async function proxy(request: NextRequest, context: RouteContext) {
 
   return new NextResponse(response.body, {
     status: response.status,
-    headers: response.headers,
+    headers: buildResponseHeaders(response.headers),
   });
 }
 
