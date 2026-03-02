@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import type {
-  AdminStudioItem,
-  StudioFormData,
-  StudioDetailResponse,
-  StudioUpdateResponse,
-  StudioDeleteResponse,
-} from "@/types/studio";
-import { studioDatabase } from "@/lib/data/studioDatabase";
+import type { StudioFormData } from "@/types/studio";
+import {
+  fetchStudioFromBackend,
+  updateStudioInBackend,
+  deleteStudioFromBackend,
+} from "@/lib/api/backend/studios";
 
 /**
  * GET /api/admin/studios/[id]
  * 스튜디오 상세 조회
+ * Proxies to backend API
  */
 export async function GET(
   request: NextRequest,
@@ -18,22 +17,9 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const studio = studioDatabase[id];
+    const accessToken = request.headers.get("authorization")?.replace("Bearer ", "");
 
-    if (!studio) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "스튜디오를 찾을 수 없습니다.",
-        },
-        { status: 404 }
-      );
-    }
-
-    const response: StudioDetailResponse = {
-      success: true,
-      data: studio,
-    };
+    const response = await fetchStudioFromBackend(id, accessToken || undefined);
 
     return NextResponse.json(response);
   } catch (error) {
@@ -49,30 +35,19 @@ export async function GET(
 }
 
 /**
- * PUT /api/admin/studios/[id]
+ * PATCH /api/admin/studios/[id]
  * 스튜디오 정보 수정
+ * Proxies to backend API
  */
-export async function PUT(
+export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const studio = studioDatabase[id];
-
-    if (!studio) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "스튜디오를 찾을 수 없습니다.",
-        },
-        { status: 404 }
-      );
-    }
-
     const body: Partial<StudioFormData> = await request.json();
 
-    // Validation - at least name should exist if provided
+    // Validation
     if (body.name === "") {
       return NextResponse.json(
         {
@@ -83,32 +58,18 @@ export async function PUT(
       );
     }
 
-    // Update studio with new data
-    const updatedStudio: AdminStudioItem = {
-      ...studio,
-      ...body,
-      id: studio.id, // Don't allow ID change
-      createdAt: studio.createdAt, // Don't allow creation time change
-      createdBy: studio.createdBy,
-      updatedAt: new Date().toISOString(),
-      updatedBy: "admin", // Should come from auth context
-    };
+    const accessToken = request.headers.get("authorization")?.replace("Bearer ", "");
 
-    studioDatabase[id] = updatedStudio;
-
-    const response: StudioUpdateResponse = {
-      success: true,
-      data: updatedStudio,
-      message: "스튜디오 정보가 저장되었습니다.",
-    };
+    const response = await updateStudioInBackend(id, body, accessToken || undefined);
 
     return NextResponse.json(response);
   } catch (error) {
     console.error("Error updating studio:", error);
+    const errorMsg = error instanceof Error ? error.message : "스튜디오 정보 저장에 실패했습니다.";
     return NextResponse.json(
       {
         success: false,
-        error: "스튜디오 정보 저장에 실패했습니다.",
+        error: errorMsg,
       },
       { status: 500 }
     );
@@ -116,8 +77,22 @@ export async function PUT(
 }
 
 /**
+ * PUT /api/admin/studios/[id]
+ * 스튜디오 정보 수정 (for backward compatibility)
+ * Proxies to backend API
+ */
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  // Forward to PATCH
+  return PATCH(request, { params });
+}
+
+/**
  * DELETE /api/admin/studios/[id]
  * 스튜디오 삭제
+ * Proxies to backend API
  */
 export async function DELETE(
   request: NextRequest,
@@ -125,32 +100,18 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const studio = studioDatabase[id];
+    const accessToken = request.headers.get("authorization")?.replace("Bearer ", "");
 
-    if (!studio) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "스튜디오를 찾을 수 없습니다.",
-        },
-        { status: 404 }
-      );
-    }
-
-    delete studioDatabase[id];
-
-    const response: StudioDeleteResponse = {
-      success: true,
-      message: "스튜디오가 삭제되었습니다.",
-    };
+    const response = await deleteStudioFromBackend(id, accessToken || undefined);
 
     return NextResponse.json(response);
   } catch (error) {
     console.error("Error deleting studio:", error);
+    const errorMsg = error instanceof Error ? error.message : "스튜디오 삭제에 실패했습니다.";
     return NextResponse.json(
       {
         success: false,
-        error: "스튜디오 삭제에 실패했습니다.",
+        error: errorMsg,
       },
       { status: 500 }
     );

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useId } from "react";
+import { useState, useEffect, useId, useCallback } from "react";
 import { getCities, getRegions, extractLocationFromAddress } from "@/lib/api/admin/masters";
+import { useGooglePlaces } from "@/hooks/useGooglePlaces";
 import { COUNTRIES } from "@/lib/data/masterData";
 import type { AdminStudioItem, StudioFormData, StudioTab } from "@/types/studio";
 import type { CityMaster, RegionMaster } from "@/types/master";
@@ -61,6 +62,7 @@ export default function StudioForm({
     description: studio?.description || "",
     operatingHours: studio?.operatingHours || "",
     amenities: studio?.amenities || [],
+    thumbnail: studio?.thumbnail || "",
   });
 
   // Master Data State
@@ -69,6 +71,64 @@ export default function StudioForm({
   const [extracting, setExtracting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Image Upload State
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(studio?.thumbnail || null);
+
+  // Handle place selection from Google Places Autocomplete
+  const handlePlaceSelected = useCallback((placeResult: { lat: number; lng: number; address: string; city?: string; region?: string }) => {
+    // Update form with place details
+    setFormData((prev) => ({
+      ...prev,
+      address: placeResult.address,
+      lat: placeResult.lat,
+      lng: placeResult.lng,
+    }));
+  }, []);
+
+  // Google Places Hook with callback
+  const { inputRef } = useGooglePlaces(handlePlaceSelected);
+
+  // Handle image file selection
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError('이미지 파일만 업로드 가능합니다.');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('파일 크기는 5MB 이하여야 합니다.');
+      return;
+    }
+
+    setImageFile(file);
+    setError(null);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const previewUrl = reader.result as string;
+      setImagePreview(previewUrl);
+      // Store preview URL temporarily (actual upload happens on form submit)
+      setFormData((prev) => ({
+        ...prev,
+        thumbnail: previewUrl,
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Handle image removal
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+  };
 
   // Load cities when country changes
   useEffect(() => {
@@ -299,6 +359,7 @@ export default function StudioForm({
             </label>
             <div className="flex gap-2">
               <input
+                ref={inputRef}
                 id={fieldIds.address}
                 type="text"
                 value={formData.address}
@@ -314,6 +375,70 @@ export default function StudioForm({
               >
                 {extracting ? "추출 중..." : "자동추출"}
               </button>
+            </div>
+            <p className="mt-1 text-xs text-gray-500">
+              Google Places를 통해 주소를 검색하면 위도/경도가 자동으로 입력됩니다.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 스튜디오 이미지 */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 className="text-lg font-bold mb-4 pb-2 border-b">스튜디오 이미지</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              스튜디오 소개 이미지
+            </label>
+            <div className="flex gap-4 items-start">
+              <div className="flex-1">
+                <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:border-gray-400 transition-colors">
+                  <div className="text-center">
+                    <svg
+                      className="mx-auto h-8 w-8 text-gray-400"
+                      stroke="currentColor"
+                      fill="none"
+                      viewBox="0 0 48 48"
+                    >
+                      <path
+                        d="M28 8H12a4 4 0 00-4 4v20a4 4 0 004 4h24a4 4 0 004-4V20m-18-2h0m-9 9h18"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    <p className="mt-2 text-sm text-gray-600">
+                      <span className="font-medium text-gray-900">클릭하여 업로드</span> 또는 드래그
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF 최대 5MB</p>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              {imagePreview && (
+                <div className="relative w-32 h-32 shrink-0">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-full object-cover rounded-md border border-gray-200"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold transition-colors"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

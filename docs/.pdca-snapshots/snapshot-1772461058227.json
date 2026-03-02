@@ -1,0 +1,1023 @@
+{
+  "timestamp": "2026-03-02T14:17:38.226Z",
+  "reason": "compaction",
+  "status": {
+    "version": "2.0",
+    "lastUpdated": "2026-03-02T14:15:44.928Z",
+    "activeFeatures": [
+      "evolutionflow-dev-admin_Cloude",
+      "data",
+      "admin",
+      "studios",
+      "[id]",
+      "new",
+      "]",
+      "status",
+      "masters",
+      "countries",
+      "cities",
+      "regions",
+      "extract-location",
+      "ui",
+      "examples",
+      "fixtures",
+      "unit",
+      "api",
+      "e2e",
+      "dto",
+      "backend",
+      "studio"
+    ],
+    "primaryFeature": "evolutionflow-dev-admin_Cloude",
+    "features": {
+      "evolutionflow-dev-admin_Cloude": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-01T22:46:16.205Z",
+          "lastUpdated": "2026-03-02T13:47:32.611Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/types/studio.ts"
+      },
+      "data": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-01T22:46:43.337Z",
+          "lastUpdated": "2026-03-02T00:33:20.230Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/lib/data/studioDatabase.ts"
+      },
+      "admin": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-01T22:46:59.563Z",
+          "lastUpdated": "2026-03-02T04:49:19.712Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/app/admin/components/StatusBadge.tsx"
+      },
+      "studios": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-01T22:47:21.833Z",
+          "lastUpdated": "2026-03-02T13:53:44.259Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/app/api/admin/studios/route.ts"
+      },
+      "[id]": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T00:01:25.480Z",
+          "lastUpdated": "2026-03-02T13:54:39.845Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/app/api/admin/studios/[id]/route.ts"
+      },
+      "new": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T00:01:34.182Z",
+          "lastUpdated": "2026-03-02T00:10:04.536Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/app/admin/studios/new/page.tsx"
+      },
+      "]": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T00:07:56.231Z",
+          "lastUpdated": "2026-03-02T00:07:56.231Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/app/api/admin/studios/\\[id\\]/route.ts"
+      },
+      "status": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T00:08:05.152Z",
+          "lastUpdated": "2026-03-02T04:22:08.382Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/app/api/admin/studios/[id]/status/route.ts"
+      },
+      "masters": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T00:08:15.067Z",
+          "lastUpdated": "2026-03-02T00:15:59.948Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/app/api/admin/masters/route.ts"
+      },
+      "countries": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T00:08:35.143Z",
+          "lastUpdated": "2026-03-02T00:08:35.143Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/app/api/admin/masters/countries/route.ts"
+      },
+      "cities": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T00:08:38.978Z",
+          "lastUpdated": "2026-03-02T00:08:38.978Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/app/api/admin/masters/cities/route.ts"
+      },
+      "regions": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T00:08:42.978Z",
+          "lastUpdated": "2026-03-02T00:08:42.978Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/app/api/admin/masters/regions/route.ts"
+      },
+      "extract-location": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T00:08:49.751Z",
+          "lastUpdated": "2026-03-02T00:15:53.283Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/app/api/admin/masters/extract-location/route.ts"
+      },
+      "ui": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T04:48:20.463Z",
+          "lastUpdated": "2026-03-02T04:49:04.984Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/components/ui/ToastContainer.tsx"
+      },
+      "examples": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T04:59:18.895Z",
+          "lastUpdated": "2026-03-02T04:59:18.895Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/docs/02-design/examples/improved-list-page-example.tsx"
+      },
+      "fixtures": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T05:06:26.708Z",
+          "lastUpdated": "2026-03-02T05:06:42.205Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/__tests__/fixtures/masters.fixture.ts"
+      },
+      "unit": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T05:07:38.682Z",
+          "lastUpdated": "2026-03-02T05:07:38.682Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/__tests__/unit/components/StudioForm.test.tsx"
+      },
+      "api": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T05:08:34.110Z",
+          "lastUpdated": "2026-03-02T05:08:34.110Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/__tests__/api/studios.api.test.ts"
+      },
+      "e2e": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T05:09:32.805Z",
+          "lastUpdated": "2026-03-02T05:09:32.805Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/e2e/studios-crud.e2e.test.ts"
+      },
+      "dto": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T13:39:51.900Z",
+          "lastUpdated": "2026-03-02T13:40:07.116Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-api_Cloude/src/studios/dto/query-studio.dto.ts"
+      },
+      "backend": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T13:53:20.478Z",
+          "lastUpdated": "2026-03-02T13:53:20.478Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/lib/api/backend/studios.ts"
+      },
+      "studio": {
+        "phase": "do",
+        "phaseNumber": 3,
+        "matchRate": null,
+        "iterationCount": 0,
+        "requirements": [],
+        "documents": {},
+        "timestamps": {
+          "started": "2026-03-02T14:15:13.287Z",
+          "lastUpdated": "2026-03-02T14:15:44.928Z"
+        },
+        "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-site-app_Cloude/src/app/teacher/studio/StudioClient.tsx"
+      }
+    },
+    "pipeline": {
+      "currentPhase": 1,
+      "level": "Dynamic",
+      "phaseHistory": []
+    },
+    "session": {
+      "startedAt": "2026-03-01T22:24:11.947Z",
+      "onboardingCompleted": false,
+      "lastActivity": "2026-03-02T14:15:44.928Z"
+    },
+    "history": [
+      {
+        "timestamp": "2026-03-01T22:46:16.205Z",
+        "feature": "evolutionflow-dev-admin_Cloude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-01T22:46:25.471Z",
+        "feature": "evolutionflow-dev-admin_Cloude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-01T22:46:43.337Z",
+        "feature": "data",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-01T22:46:59.563Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-01T22:47:10.801Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-01T22:47:21.833Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-01T22:47:55.767Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-01T22:48:00.211Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-01T22:50:47.046Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:01:25.480Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:01:34.182Z",
+        "feature": "new",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:01:38.890Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:01:44.076Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:01:48.617Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:01:53.081Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:07:44.741Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:07:56.231Z",
+        "feature": "]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:08:05.152Z",
+        "feature": "status",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:08:15.067Z",
+        "feature": "masters",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:08:29.960Z",
+        "feature": "masters",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:08:35.143Z",
+        "feature": "countries",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:08:38.978Z",
+        "feature": "cities",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:08:42.978Z",
+        "feature": "regions",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:08:49.751Z",
+        "feature": "extract-location",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:09:07.754Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:09:19.858Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:09:23.958Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:09:32.957Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:09:45.737Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:09:50.342Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:09:55.067Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:09:59.445Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:10:04.536Z",
+        "feature": "new",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:13:46.953Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:15:06.282Z",
+        "feature": "status",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:15:19.567Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:15:23.225Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:15:26.904Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:15:30.310Z",
+        "feature": "status",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:15:53.283Z",
+        "feature": "extract-location",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:15:59.948Z",
+        "feature": "masters",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:16:16.400Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:16:34.224Z",
+        "feature": "status",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:16:54.231Z",
+        "feature": "status",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:17:09.920Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:17:26.342Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:17:40.702Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:17:45.803Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:33:20.230Z",
+        "feature": "data",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:33:28.901Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:33:42.448Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:33:53.051Z",
+        "feature": "status",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T00:34:04.627Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T04:22:08.382Z",
+        "feature": "status",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T04:22:31.895Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T04:23:28.857Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T04:23:39.523Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T04:24:02.021Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T04:24:30.278Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T04:25:42.880Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T04:25:59.490Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T04:26:16.237Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T04:48:20.464Z",
+        "feature": "ui",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T04:48:29.820Z",
+        "feature": "ui",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T04:48:51.247Z",
+        "feature": "ui",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T04:48:58.933Z",
+        "feature": "evolutionflow-dev-admin_Cloude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T04:49:04.984Z",
+        "feature": "ui",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T04:49:19.712Z",
+        "feature": "admin",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T04:59:18.895Z",
+        "feature": "examples",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T05:05:54.846Z",
+        "feature": "evolutionflow-dev-admin_Cloude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T05:06:01.081Z",
+        "feature": "evolutionflow-dev-admin_Cloude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T05:06:26.708Z",
+        "feature": "fixtures",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T05:06:42.205Z",
+        "feature": "fixtures",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T05:07:38.682Z",
+        "feature": "unit",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T05:08:34.110Z",
+        "feature": "api",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T05:08:45.430Z",
+        "feature": "evolutionflow-dev-admin_Cloude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T05:09:32.805Z",
+        "feature": "e2e",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:39:51.900Z",
+        "feature": "dto",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:40:07.116Z",
+        "feature": "dto",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:40:14.664Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:40:22.721Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:40:32.578Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:40:56.036Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:41:07.277Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:41:11.670Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:42:36.155Z",
+        "feature": "evolutionflow-dev-admin_Cloude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:43:46.309Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:43:52.031Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:43:58.828Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:44:12.102Z",
+        "feature": "evolutionflow-dev-admin_Cloude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:44:19.461Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:44:24.322Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:44:28.544Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:44:50.679Z",
+        "feature": "evolutionflow-dev-admin_Cloude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:45:05.661Z",
+        "feature": "evolutionflow-dev-admin_Cloude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:45:09.316Z",
+        "feature": "evolutionflow-dev-admin_Cloude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:45:59.781Z",
+        "feature": "evolutionflow-dev-admin_Cloude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:46:15.484Z",
+        "feature": "evolutionflow-dev-admin_Cloude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:46:18.988Z",
+        "feature": "evolutionflow-dev-admin_Cloude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:46:40.787Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:46:46.623Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:46:55.709Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:47:05.749Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:47:09.060Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:47:28.446Z",
+        "feature": "evolutionflow-dev-admin_Cloude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:47:32.611Z",
+        "feature": "evolutionflow-dev-admin_Cloude",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:47:47.386Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:47:55.278Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:48:00.954Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:53:20.478Z",
+        "feature": "backend",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:53:44.259Z",
+        "feature": "studios",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T13:54:39.845Z",
+        "feature": "[id]",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T14:15:13.287Z",
+        "feature": "studio",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T14:15:36.071Z",
+        "feature": "studio",
+        "phase": "do",
+        "action": "updated"
+      },
+      {
+        "timestamp": "2026-03-02T14:15:44.928Z",
+        "feature": "studio",
+        "phase": "do",
+        "action": "updated"
+      }
+    ]
+  }
+}

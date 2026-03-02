@@ -21,6 +21,7 @@ export interface StudioItem {
   social: string;
   lat: number;
   lng: number;
+  thumbnail?: string;
 }
 
 /**
@@ -67,6 +68,7 @@ export interface StudioFormData {
   description?: string;
   operatingHours?: string;
   amenities?: string[];
+  thumbnail?: string;
 }
 
 /**
