@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../styles/design-tokens.css";
 
 @theme inline {
   --font-pretendard: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -7,4 +8,25 @@
 html,
 body {
   min-height: 100%;
+}
+
+/* Global utility classes for consistent UI */
+.bg-background {
+  background-color: rgb(var(--color-background));
+}
+
+.text-foreground {
+  color: rgb(var(--color-foreground));
+}
+
+.border-border {
+  border-color: rgb(var(--color-border));
+}
+
+.text-muted-foreground {
+  color: rgb(var(--color-muted-foreground));
+}
+
+.bg-muted {
+  background-color: rgb(var(--color-muted));
 }

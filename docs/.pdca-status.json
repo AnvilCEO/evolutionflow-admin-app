@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-03-02T04:26:16.237Z",
+  "lastUpdated": "2026-03-02T05:09:32.805Z",
   "activeFeatures": [
     "evolutionflow-dev-admin_Cloude",
     "data",
@@ -14,7 +14,13 @@
     "countries",
     "cities",
     "regions",
-    "extract-location"
+    "extract-location",
+    "ui",
+    "examples",
+    "fixtures",
+    "unit",
+    "api",
+    "e2e"
   ],
   "primaryFeature": "evolutionflow-dev-admin_Cloude",
   "features": {
@@ -27,9 +33,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-03-01T22:46:16.205Z",
-        "lastUpdated": "2026-03-01T22:46:25.471Z"
+        "lastUpdated": "2026-03-02T05:08:45.430Z"
       },
-      "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/types/studio.ts"
+      "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/playwright.config.ts"
     },
     "data": {
       "phase": "do",
@@ -53,9 +59,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-03-01T22:46:59.563Z",
-        "lastUpdated": "2026-03-02T00:17:45.803Z"
+        "lastUpdated": "2026-03-02T04:49:19.712Z"
       },
-      "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/lib/api/admin/masters.ts"
+      "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/app/admin/components/StatusBadge.tsx"
     },
     "studios": {
       "phase": "do",
@@ -186,6 +192,84 @@
         "lastUpdated": "2026-03-02T00:15:53.283Z"
       },
       "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/app/api/admin/masters/extract-location/route.ts"
+    },
+    "ui": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-02T04:48:20.463Z",
+        "lastUpdated": "2026-03-02T04:49:04.984Z"
+      },
+      "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/components/ui/ToastContainer.tsx"
+    },
+    "examples": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-02T04:59:18.895Z",
+        "lastUpdated": "2026-03-02T04:59:18.895Z"
+      },
+      "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/docs/02-design/examples/improved-list-page-example.tsx"
+    },
+    "fixtures": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-02T05:06:26.708Z",
+        "lastUpdated": "2026-03-02T05:06:42.205Z"
+      },
+      "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/__tests__/fixtures/masters.fixture.ts"
+    },
+    "unit": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-02T05:07:38.682Z",
+        "lastUpdated": "2026-03-02T05:07:38.682Z"
+      },
+      "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/__tests__/unit/components/StudioForm.test.tsx"
+    },
+    "api": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-02T05:08:34.110Z",
+        "lastUpdated": "2026-03-02T05:08:34.110Z"
+      },
+      "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/src/__tests__/api/studios.api.test.ts"
+    },
+    "e2e": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-02T05:09:32.805Z",
+        "lastUpdated": "2026-03-02T05:09:32.805Z"
+      },
+      "lastFile": "/Users/beejayjung/Dev/EvolutionflowKorea/evolutionflow-dev-admin_Cloude/e2e/studios-crud.e2e.test.ts"
     }
   },
   "pipeline": {
@@ -196,7 +280,7 @@
   "session": {
     "startedAt": "2026-03-01T22:24:11.947Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-03-02T04:26:16.237Z"
+    "lastActivity": "2026-03-02T05:09:32.805Z"
   },
   "history": [
     {
@@ -568,6 +652,96 @@
     {
       "timestamp": "2026-03-02T04:26:16.237Z",
       "feature": "studios",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T04:48:20.464Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T04:48:29.820Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T04:48:51.247Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T04:48:58.933Z",
+      "feature": "evolutionflow-dev-admin_Cloude",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T04:49:04.984Z",
+      "feature": "ui",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T04:49:19.712Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T04:59:18.895Z",
+      "feature": "examples",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T05:05:54.846Z",
+      "feature": "evolutionflow-dev-admin_Cloude",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T05:06:01.081Z",
+      "feature": "evolutionflow-dev-admin_Cloude",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T05:06:26.708Z",
+      "feature": "fixtures",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T05:06:42.205Z",
+      "feature": "fixtures",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T05:07:38.682Z",
+      "feature": "unit",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T05:08:34.110Z",
+      "feature": "api",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T05:08:45.430Z",
+      "feature": "evolutionflow-dev-admin_Cloude",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-02T05:09:32.805Z",
+      "feature": "e2e",
       "phase": "do",
       "action": "updated"
     }

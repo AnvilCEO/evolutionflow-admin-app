@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useId } from "react";
 import { getCities, getRegions, extractLocationFromAddress } from "@/lib/api/admin/masters";
 import { COUNTRIES } from "@/lib/data/masterData";
 import type { AdminStudioItem, StudioFormData, StudioTab } from "@/types/studio";
@@ -20,6 +20,26 @@ export default function StudioForm({
   onCancel,
 }: StudioFormProps) {
   const isEditMode = !!studio;
+  const idPrefix = useId();
+  const fieldIds = {
+    name: `${idPrefix}-name`,
+    tab: `${idPrefix}-tab`,
+    country: `${idPrefix}-country`,
+    city: `${idPrefix}-city`,
+    region: `${idPrefix}-region`,
+    address: `${idPrefix}-address`,
+    phone: `${idPrefix}-phone`,
+    social: `${idPrefix}-social`,
+    managerName: `${idPrefix}-manager-name`,
+    managerPhone: `${idPrefix}-manager-phone`,
+    managerEmail: `${idPrefix}-manager-email`,
+    capacity: `${idPrefix}-capacity`,
+    operatingHours: `${idPrefix}-operating-hours`,
+    description: `${idPrefix}-description`,
+    lat: `${idPrefix}-lat`,
+    lng: `${idPrefix}-lng`,
+    status: `${idPrefix}-status`,
+  };
 
   // Form State
   const [formData, setFormData] = useState<StudioFormData>({
@@ -182,10 +202,11 @@ export default function StudioForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* 스튜디오명 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={fieldIds.name} className="block text-sm font-medium text-gray-700 mb-1">
               스튜디오명 <span className="text-red-500">*</span>
             </label>
             <input
+              id={fieldIds.name}
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -196,10 +217,11 @@ export default function StudioForm({
 
           {/* 스튜디오 유형 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={fieldIds.tab} className="block text-sm font-medium text-gray-700 mb-1">
               스튜디오 유형 <span className="text-red-500">*</span>
             </label>
             <select
+              id={fieldIds.tab}
               value={formData.tab}
               onChange={(e) => setFormData({ ...formData, tab: e.target.value as StudioTab })}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
@@ -212,10 +234,11 @@ export default function StudioForm({
 
           {/* 국가 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={fieldIds.country} className="block text-sm font-medium text-gray-700 mb-1">
               국가 <span className="text-red-500">*</span>
             </label>
             <select
+              id={fieldIds.country}
               value={formData.country}
               onChange={(e) => setFormData({ ...formData, country: e.target.value as "KR" | "CN" })}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
@@ -230,10 +253,11 @@ export default function StudioForm({
 
           {/* 도시 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={fieldIds.city} className="block text-sm font-medium text-gray-700 mb-1">
               도시 <span className="text-red-500">*</span>
             </label>
             <select
+              id={fieldIds.city}
               value={formData.city}
               onChange={(e) => setFormData({ ...formData, city: e.target.value })}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
@@ -249,10 +273,11 @@ export default function StudioForm({
 
           {/* 지역 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={fieldIds.region} className="block text-sm font-medium text-gray-700 mb-1">
               지역 <span className="text-red-500">*</span>
             </label>
             <select
+              id={fieldIds.region}
               value={formData.region}
               onChange={(e) => setFormData({ ...formData, region: e.target.value })}
               disabled={!formData.city}
@@ -269,11 +294,12 @@ export default function StudioForm({
 
           {/* 주소 */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={fieldIds.address} className="block text-sm font-medium text-gray-700 mb-1">
               주소 <span className="text-red-500">*</span>
             </label>
             <div className="flex gap-2">
               <input
+                id={fieldIds.address}
                 type="text"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
@@ -283,7 +309,7 @@ export default function StudioForm({
               <button
                 type="button"
                 onClick={handleExtractLocation}
-                disabled={extracting || !formData.address.trim()}
+                disabled={extracting}
                 className="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {extracting ? "추출 중..." : "자동추출"}
@@ -300,10 +326,11 @@ export default function StudioForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* 대표번호 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={fieldIds.phone} className="block text-sm font-medium text-gray-700 mb-1">
               대표번호 <span className="text-red-500">*</span>
             </label>
             <input
+              id={fieldIds.phone}
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -314,8 +341,9 @@ export default function StudioForm({
 
           {/* SNS */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">SNS</label>
+            <label htmlFor={fieldIds.social} className="block text-sm font-medium text-gray-700 mb-1">SNS</label>
             <input
+              id={fieldIds.social}
               type="text"
               value={formData.social}
               onChange={(e) => setFormData({ ...formData, social: e.target.value })}
@@ -326,8 +354,9 @@ export default function StudioForm({
 
           {/* 담당자명 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">담당자명</label>
+            <label htmlFor={fieldIds.managerName} className="block text-sm font-medium text-gray-700 mb-1">담당자명</label>
             <input
+              id={fieldIds.managerName}
               type="text"
               value={formData.managerName}
               onChange={(e) => setFormData({ ...formData, managerName: e.target.value })}
@@ -338,8 +367,9 @@ export default function StudioForm({
 
           {/* 담당자 전화 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">담당자 전화</label>
+            <label htmlFor={fieldIds.managerPhone} className="block text-sm font-medium text-gray-700 mb-1">담당자 전화</label>
             <input
+              id={fieldIds.managerPhone}
               type="tel"
               value={formData.managerPhone}
               onChange={(e) => setFormData({ ...formData, managerPhone: e.target.value })}
@@ -350,8 +380,9 @@ export default function StudioForm({
 
           {/* 담당자 이메일 */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">담당자 이메일</label>
+            <label htmlFor={fieldIds.managerEmail} className="block text-sm font-medium text-gray-700 mb-1">담당자 이메일</label>
             <input
+              id={fieldIds.managerEmail}
               type="email"
               value={formData.managerEmail}
               onChange={(e) => setFormData({ ...formData, managerEmail: e.target.value })}
@@ -369,8 +400,9 @@ export default function StudioForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* 수용 인원 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">수용 인원</label>
+            <label htmlFor={fieldIds.capacity} className="block text-sm font-medium text-gray-700 mb-1">수용 인원</label>
             <input
+              id={fieldIds.capacity}
               type="number"
               value={formData.capacity}
               onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) || 0 })}
@@ -381,8 +413,9 @@ export default function StudioForm({
 
           {/* 운영 시간 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">운영 시간</label>
+            <label htmlFor={fieldIds.operatingHours} className="block text-sm font-medium text-gray-700 mb-1">운영 시간</label>
             <input
+              id={fieldIds.operatingHours}
               type="text"
               value={formData.operatingHours}
               onChange={(e) => setFormData({ ...formData, operatingHours: e.target.value })}
@@ -393,8 +426,9 @@ export default function StudioForm({
 
           {/* 시설 설명 */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">시설 설명</label>
+            <label htmlFor={fieldIds.description} className="block text-sm font-medium text-gray-700 mb-1">시설 설명</label>
             <textarea
+              id={fieldIds.description}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="시설에 대한 설명을 입력하세요"
@@ -443,10 +477,11 @@ export default function StudioForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* 위도 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={fieldIds.lat} className="block text-sm font-medium text-gray-700 mb-1">
               위도 <span className="text-red-500">*</span>
             </label>
             <input
+              id={fieldIds.lat}
               type="number"
               step="0.0001"
               value={formData.lat}
@@ -458,10 +493,11 @@ export default function StudioForm({
 
           {/* 경도 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={fieldIds.lng} className="block text-sm font-medium text-gray-700 mb-1">
               경도 <span className="text-red-500">*</span>
             </label>
             <input
+              id={fieldIds.lng}
               type="number"
               step="0.0001"
               value={formData.lng}
@@ -481,8 +517,9 @@ export default function StudioForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* 상태 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">상태</label>
+              <label htmlFor={fieldIds.status} className="block text-sm font-medium text-gray-700 mb-1">상태</label>
               <select
+                id={fieldIds.status}
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as "active" | "inactive" | "maintenance" })}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
