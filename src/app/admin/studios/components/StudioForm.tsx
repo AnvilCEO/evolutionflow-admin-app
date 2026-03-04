@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useId, useCallback } from "react";
+import { useState, useEffect, useId, useCallback, useRef } from "react";
 import { getCities, getRegions, extractLocationFromAddress } from "@/lib/api/admin/masters";
 import { useGooglePlaces } from "@/hooks/useGooglePlaces";
 import { COUNTRIES } from "@/lib/data/masterData";
@@ -40,8 +40,6 @@ export default function StudioForm({
     capacity: `${idPrefix}-capacity`,
     operatingHours: `${idPrefix}-operating-hours`,
     description: `${idPrefix}-description`,
-    lat: `${idPrefix}-lat`,
-    lng: `${idPrefix}-lng`,
     status: `${idPrefix}-status`,
   };
 
@@ -71,11 +69,13 @@ export default function StudioForm({
   // Master Data State
   const [cities, setCities] = useState<CityMaster[]>([]);
   const [regions, setRegions] = useState<RegionMaster[]>([]);
-  const [extracting, setExtracting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Upload takes longer, so we distinguish submission states
   const [submitting, setSubmitting] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+
+  // Address search state
+  const [addressVerified, setAddressVerified] = useState(!!studio?.address);
+  const [addressSearchText, setAddressSearchText] = useState(studio?.address || "");
 
   // Image Upload State
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -83,14 +83,59 @@ export default function StudioForm({
 
   // Handle place selection from Google Places Autocomplete
   const handlePlaceSelected = useCallback((placeResult: { lat: number; lng: number; address: string; city?: string; region?: string }) => {
-    // Update form with place details
+    // Update form with place details – address, lat, lng are all set from Google
     setFormData((prev) => ({
       ...prev,
       address: placeResult.address,
       lat: placeResult.lat,
       lng: placeResult.lng,
     }));
+    setAddressSearchText(placeResult.address);
+    setAddressVerified(true);
+
+    // Try auto-extract city/region from address
+    extractLocationFromAddress(
+      "KR",
+      placeResult.address
+    ).then((result) => {
+      if (result.cityId) {
+        setFormData((prev) => ({
+          ...prev,
+          city: result.cityId!,
+        }));
+        if (result.confidence === "high" && result.regionId) {
+          setTimeout(() => {
+            setFormData((prev) => ({
+              ...prev,
+              region: result.regionId!,
+            }));
+          }, 300);
+        }
+      }
+    }).catch(() => {
+      // Silently fail — user can still select city/region manually
+    });
   }, []);
+
+  // E2E Test compatibility: listen for custom event to simulate Google Places selection
+  useEffect(() => {
+    const form = document.querySelector('form');
+    if (!form) return;
+
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.address && detail?.lat && detail?.lng) {
+        handlePlaceSelected({
+          address: detail.address,
+          lat: detail.lat,
+          lng: detail.lng,
+        });
+      }
+    };
+
+    form.addEventListener('__test_place_selected', handler);
+    return () => form.removeEventListener('__test_place_selected', handler);
+  }, [handlePlaceSelected]);
 
   // Google Places Hook with callback
   const { inputRef } = useGooglePlaces(handlePlaceSelected);
@@ -120,8 +165,6 @@ export default function StudioForm({
     reader.onloadend = () => {
       const previewUrl = reader.result as string;
       setImagePreview(previewUrl);
-      // NOTE: We don't save preview to formData.thumbnail anymore,
-      // actual Vercel upload is triggered at form submit to prevent payloads > 4.5mb.
     };
     reader.readAsDataURL(file);
   };
@@ -132,8 +175,24 @@ export default function StudioForm({
     setImagePreview(null);
     setFormData((prev) => ({
       ...prev,
-      thumbnail: "", // Remove from original data as well
+      thumbnail: "",
     }));
+  };
+
+  // Handle address clear (user wants to re-search)
+  const handleClearAddress = () => {
+    setAddressVerified(false);
+    setAddressSearchText("");
+    setFormData((prev) => ({
+      ...prev,
+      address: "",
+      lat: 0,
+      lng: 0,
+    }));
+    // Focus the search input after clearing
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
   };
 
   // Load cities when country changes
@@ -142,14 +201,16 @@ export default function StudioForm({
       try {
         const citiesList = await getCities(formData.country as "KR" | "CN");
         setCities(citiesList);
-        setFormData((prev) => ({ ...prev, city: "", region: "" }));
+        if (!isEditMode) {
+          setFormData((prev) => ({ ...prev, city: "", region: "" }));
+        }
         setRegions([]);
       } catch (err) {
         console.error("Failed to load cities:", err);
       }
     };
     loadCities();
-  }, [formData.country]);
+  }, [formData.country, isEditMode]);
 
   // Load regions when city changes
   useEffect(() => {
@@ -158,7 +219,9 @@ export default function StudioForm({
         try {
           const regionsList = await getRegions(formData.city);
           setRegions(regionsList);
-          setFormData((prev) => ({ ...prev, region: "" }));
+          if (!isEditMode) {
+            setFormData((prev) => ({ ...prev, region: "" }));
+          }
         } catch (err) {
           console.error("Failed to load regions:", err);
         }
@@ -167,53 +230,7 @@ export default function StudioForm({
       }
     };
     loadRegions();
-  }, [formData.city]);
-
-  // Handle address auto-extraction
-  const handleExtractLocation = async () => {
-    if (!formData.address.trim()) {
-      setError("주소를 입력해주세요.");
-      return;
-    }
-
-    try {
-      setExtracting(true);
-      setError(null);
-
-      const result = await extractLocationFromAddress(
-        formData.country as "KR" | "CN",
-        formData.address
-      );
-
-      if (result.confidence === "low") {
-        setError("주소에서 도시/지역을 추출할 수 없습니다. 수동으로 선택해주세요.");
-        return;
-      }
-
-      // Update form with extracted data
-      if (result.cityId) {
-        setFormData((prev) => ({
-          ...prev,
-          city: result.cityId!,
-        }));
-      }
-
-      if (result.confidence === "high" && result.regionId) {
-        // Wait for regions to load, then set region
-        setTimeout(() => {
-          setFormData((prev) => ({
-            ...prev,
-            region: result.regionId!,
-          }));
-        }, 100);
-      }
-    } catch (err) {
-      setError("주소 추출에 실패했습니다.");
-      console.error("Failed to extract location:", err);
-    } finally {
-      setExtracting(false);
-    }
-  };
+  }, [formData.city, isEditMode]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -230,13 +247,13 @@ export default function StudioForm({
       return;
     }
 
-    if (!formData.address.trim()) {
-      setError("주소를 입력해주세요.");
+    if (!addressVerified || !formData.address.trim()) {
+      setError("주소 검색을 통해 주소를 선택해주세요.");
       return;
     }
 
     if (formData.lat === 0 || formData.lng === 0) {
-      setError("위도/경도를 입력해주세요.");
+      setError("주소 검색을 통해 유효한 주소를 선택해주세요. (좌표가 설정되지 않았습니다)");
       return;
     }
 
@@ -369,33 +386,62 @@ export default function StudioForm({
             </select>
           </div>
 
-          {/* 주소 */}
+          {/* 주소 검색 */}
           <div className="md:col-span-2">
             <label htmlFor={fieldIds.address} className="block text-sm font-medium text-gray-700 mb-1">
               주소 <span className="text-red-500">*</span>
             </label>
-            <div className="flex gap-2">
-              <input
-                ref={inputRef}
-                id={fieldIds.address}
-                type="text"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                placeholder="예: 서울시 강남구 테헤란로 123"
-                className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
-              />
-              <button
-                type="button"
-                onClick={handleExtractLocation}
-                disabled={extracting}
-                className="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {extracting ? "추출 중..." : "자동추출"}
-              </button>
-            </div>
-            <p className="mt-1 text-xs text-gray-500">
-              Google Places를 통해 주소를 검색하면 위도/경도가 자동으로 입력됩니다.
-            </p>
+
+            {/* 검색된 주소가 확정되었을 때 */}
+            {addressVerified ? (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-md">
+                  <svg className="w-5 h-5 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-sm text-green-800 flex-1">{formData.address}</span>
+                  <button
+                    type="button"
+                    onClick={handleClearAddress}
+                    className="text-xs text-gray-500 hover:text-red-600 underline transition-colors shrink-0"
+                  >
+                    다시 검색
+                  </button>
+                </div>
+                {/* 좌표 확인 배지 */}
+                <div className="flex items-center gap-3 text-xs text-gray-500">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 rounded">
+                    📍 위도: {formData.lat.toFixed(4)}
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 rounded">
+                    📍 경도: {formData.lng.toFixed(4)}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              /* 주소 검색 입력 */
+              <div>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      ref={inputRef}
+                      id={fieldIds.address}
+                      type="text"
+                      value={addressSearchText}
+                      onChange={(e) => setAddressSearchText(e.target.value)}
+                      placeholder="주소를 입력하면 자동완성 목록에서 선택하세요"
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                    />
+                    <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <p className="mt-1.5 text-xs text-gray-500">
+                  🔍 주소를 입력하면 Google Places 자동완성 목록이 표시됩니다. <strong>목록에서 주소를 선택</strong>하면 위도/경도가 자동으로 반영됩니다.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -612,46 +658,7 @@ export default function StudioForm({
         </div>
       </div>
 
-      {/* 위치 정보 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-bold mb-4 pb-2 border-b">위치 정보</h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* 위도 */}
-          <div>
-            <label htmlFor={fieldIds.lat} className="block text-sm font-medium text-gray-700 mb-1">
-              위도 <span className="text-red-500">*</span>
-            </label>
-            <input
-              id={fieldIds.lat}
-              type="number"
-              step="0.0001"
-              value={formData.lat}
-              onChange={(e) => setFormData({ ...formData, lat: parseFloat(e.target.value) || 0 })}
-              placeholder="예: 37.4979"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
-            />
-          </div>
-
-          {/* 경도 */}
-          <div>
-            <label htmlFor={fieldIds.lng} className="block text-sm font-medium text-gray-700 mb-1">
-              경도 <span className="text-red-500">*</span>
-            </label>
-            <input
-              id={fieldIds.lng}
-              type="number"
-              step="0.0001"
-              value={formData.lng}
-              onChange={(e) => setFormData({ ...formData, lng: parseFloat(e.target.value) || 0 })}
-              placeholder="예: 127.0276"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* 추가 정보 */}
+      {/* 추가 정보 (편집 모드에서만) */}
       {isEditMode && (
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-bold mb-4 pb-2 border-b">추가 정보</h3>
