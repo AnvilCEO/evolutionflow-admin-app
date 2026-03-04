@@ -78,8 +78,20 @@ export async function POST(request: NextRequest) {
 
     const accessToken = request.headers.get("authorization")?.replace("Bearer ", "");
 
+    // Map frontend fields (lat, lng) to backend fields (latitude, longitude)
+    // and provide a default 'type' since backend requires it but frontend doesn't have it yet.
+    const backendData = {
+      ...body,
+      latitude: body.lat,
+      longitude: body.lng,
+      type: "yoga", // Default type
+    };
+    // Remove old lat/lng to prevent extra unknown fields
+    delete (backendData as any).lat;
+    delete (backendData as any).lng;
+
     // Call backend API
-    const response = await createStudioInBackend(body, accessToken || undefined);
+    const response = await createStudioInBackend(backendData as any, accessToken || undefined);
 
     return NextResponse.json(response, { status: 201 });
   } catch (error) {

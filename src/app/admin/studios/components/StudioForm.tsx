@@ -4,6 +4,8 @@ import { useState, useEffect, useId, useCallback } from "react";
 import { getCities, getRegions, extractLocationFromAddress } from "@/lib/api/admin/masters";
 import { useGooglePlaces } from "@/hooks/useGooglePlaces";
 import { COUNTRIES } from "@/lib/data/masterData";
+import { uploadImage } from "@/lib/api/admin/upload";
+import { useAuth } from "@/contexts/AuthContext";
 import type { AdminStudioItem, StudioFormData, StudioTab } from "@/types/studio";
 import type { CityMaster, RegionMaster } from "@/types/master";
 
@@ -21,6 +23,7 @@ export default function StudioForm({
   onCancel,
 }: StudioFormProps) {
   const isEditMode = !!studio;
+  const { accessToken } = useAuth();
   const idPrefix = useId();
   const fieldIds = {
     name: `${idPrefix}-name`,
@@ -70,7 +73,9 @@ export default function StudioForm({
   const [regions, setRegions] = useState<RegionMaster[]>([]);
   const [extracting, setExtracting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Upload takes longer, so we distinguish submission states
   const [submitting, setSubmitting] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Image Upload State
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -115,11 +120,8 @@ export default function StudioForm({
     reader.onloadend = () => {
       const previewUrl = reader.result as string;
       setImagePreview(previewUrl);
-      // Store preview URL temporarily (actual upload happens on form submit)
-      setFormData((prev) => ({
-        ...prev,
-        thumbnail: previewUrl,
-      }));
+      // NOTE: We don't save preview to formData.thumbnail anymore,
+      // actual Vercel upload is triggered at form submit to prevent payloads > 4.5mb.
     };
     reader.readAsDataURL(file);
   };
@@ -128,6 +130,10 @@ export default function StudioForm({
   const handleRemoveImage = () => {
     setImageFile(null);
     setImagePreview(null);
+    setFormData((prev) => ({
+      ...prev,
+      thumbnail: "", // Remove from original data as well
+    }));
   };
 
   // Load cities when country changes
@@ -237,11 +243,22 @@ export default function StudioForm({
     try {
       setSubmitting(true);
       setError(null);
-      await onSubmit(formData);
+
+      let finalThumbnail = formData.thumbnail;
+
+      // Upload image via Vercel Blob API first if needed
+      if (imageFile) {
+        setUploadingImage(true);
+        const uploadResult = await uploadImage(imageFile, accessToken || undefined);
+        finalThumbnail = uploadResult.url;
+      }
+
+      await onSubmit({ ...formData, thumbnail: finalThumbnail });
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "저장에 실패했습니다.";
       setError(errorMsg);
     } finally {
+      setUploadingImage(false);
       setSubmitting(false);
     }
   };
@@ -694,10 +711,10 @@ export default function StudioForm({
 
         <button
           type="submit"
-          disabled={submitting || isLoading}
+          disabled={submitting || isLoading || uploadingImage}
           className="px-6 py-2 bg-black text-white text-sm font-medium rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {submitting || isLoading ? "저장 중..." : "저장"}
+          {uploadingImage ? "이미지 업로드 중..." : (submitting || isLoading) ? "저장 중..." : "저장"}
         </button>
       </div>
     </form>
