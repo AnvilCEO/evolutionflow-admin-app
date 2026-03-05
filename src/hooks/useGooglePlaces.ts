@@ -1,3 +1,7 @@
+/**
+ * Google Places Autocomplete Hook
+ * 환경변수 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY를 사용하여 주소 검색 기능을 제공합니다.
+ */
 import { useEffect, useRef, useCallback } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 
