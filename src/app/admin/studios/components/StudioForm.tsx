@@ -75,7 +75,6 @@ export default function StudioForm({
 
   // Address search state
   const [addressVerified, setAddressVerified] = useState(!!studio?.address);
-  const [addressSearchText, setAddressSearchText] = useState(studio?.address || "");
 
   // Image Upload State
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -90,7 +89,10 @@ export default function StudioForm({
       lat: placeResult.lat,
       lng: placeResult.lng,
     }));
-    setAddressSearchText(placeResult.address);
+    // Update the input value directly (uncontrolled)
+    if (inputRef.current) {
+      inputRef.current.value = placeResult.address;
+    }
     setAddressVerified(true);
 
     // Try auto-extract city/region from address
@@ -182,16 +184,18 @@ export default function StudioForm({
   // Handle address clear (user wants to re-search)
   const handleClearAddress = () => {
     setAddressVerified(false);
-    setAddressSearchText("");
     setFormData((prev) => ({
       ...prev,
       address: "",
       lat: 0,
       lng: 0,
     }));
-    // Focus the search input after clearing
+    // Clear and focus the search input after clearing
     setTimeout(() => {
-      inputRef.current?.focus();
+      if (inputRef.current) {
+        inputRef.current.value = "";
+        inputRef.current.focus();
+      }
     }, 100);
   };
 
@@ -427,9 +431,8 @@ export default function StudioForm({
                       ref={inputRef}
                       id={fieldIds.address}
                       type="text"
-                      value={addressSearchText}
-                      onChange={(e) => setAddressSearchText(e.target.value)}
-                      placeholder="주소를 입력하면 자동완성 목록에서 선택하세요"
+                      defaultValue={studio?.address || ""}
+                      placeholder="예: 서울 강남구 테헤란로 → 자동완성 드롭다운에서 선택"
                       className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
                     />
                     <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
